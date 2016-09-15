@@ -1,59 +1,129 @@
 <?php
-
 add_role( 'pacjent',
-          'Pacjent',
-          array(
-                'read' => true,
-
-                'read_msis_29' => true,
-                'edit_msis_29' => true,
-                'publish_msis_29' => true,
-                'edit_msis_29s' => true,
-
-                'delete_msis_29' => false,
-                'read_private_msis_29' => false,
-                'edit_others_msis_29' => false,
-
-
-
-                'read_eq5d' => true,
-                'edit_eq5d' => true,
-                'publish_eq5d' => true,
-                'edit_eq5ds' => true,
-
-                'delete_eq5d' => false,
-                'read_private_eq5d' => false,
-                'edit_others_eq5d' => false,
-        )
+    'Pacjent',
+    array(
+        'read' => true,
+        'read_msis_29' => true,
+        'edit_msis_29' => true,
+        'publish_msis_29' => true,
+        'edit_msis_29s' => true,
+        'delete_msis_29' => false,
+        'read_private_msis_29' => false,
+        'edit_others_msis_29' => false,
+        'read_eq5d' => true,
+        'edit_eq5d' => true,
+        'publish_eq5d' => true,
+        'edit_eq5ds' => true,
+        'delete_eq5d' => false,
+        'read_private_eq5d' => false,
+        'edit_others_eq5d' => false,
+    )
 );
-
 add_role( 'lekarz',
-          'Lekarz',
-          array(
-              'read' => true,
-
-              'read_private_msis_29' => true,
-              'edit_others_msis_29' => true,
-              'read_msis_29' => true,
-              'edit_msis_29s' => true,
-              'delete_msis_29' => true,
-              'edit_msis_29' => true,
-
-              'publish_msis_29' => false,
-
-
-              'read_private_eq5d' => true,
-              'edit_others_eq5d' => true,
-              'read_eq5d' => true,
-              'edit_eq5ds' => true,
-              'delete_eq5d' => true,
-              'edit_eq5d' => true,
-
-              'publish_eq5d' => false,
-
+    'Lekarz',
+    array(
+        'read' => true,
+        'list_users' => true,
+        'add_users' => true,
+        'create_users' => true,
+        'edit_users' => true,
+        'read_private_msis_29' => true,
+        'edit_others_msis_29' => true,
+        'read_msis_29' => true,
+        'edit_msis_29s' => true,
+        'delete_msis_29' => true,
+        'edit_msis_29' => true,
+        'publish_msis_29' => false,
+        'read_private_eq5d' => true,
+        'edit_others_eq5d' => true,
+        'read_eq5d' => true,
+        'edit_eq5ds' => true,
+        'delete_eq5d' => true,
+        'edit_eq5d' => true,
+        'publish_eq5d' => false,
     ));
-
 /*Pobranie roli administratora*/
+$role = get_role( 'administrator' );
+if ( !empty ($role) ){
+    $role->add_cap('read_msis_29');
+    $role->add_cap('read_private_msis_29');
+    $role->add_cap('edit_msis_29');
+    $role->add_cap('edit_msis_29s');
+    $role->add_cap('edit_others_msis_29');
+    $role->add_cap('publish_msis_29');
+    $role->add_cap('delete_msis_29');
+    $role->add_cap( 'edit_msis_29' );
+    $role->add_cap( 'delete_msis_29' );
+//
+    $role->add_cap('read_eq5d');
+    $role->add_cap('edit_eq5d');
+//    $role->add_cap('publish_eq5d');
+    $role->add_cap('edit_eq5ds');
+    $role->add_cap('delete_eq5d');
+    $role->add_cap('read_private_eq5d');
+    $role->add_cap('edit_others_eq5d');
+//    $role->remove_cap('read_msis_29');
+//    $role->remove_cap('edit_msis_29');
+//    $role->remove_cap('edit_msis_29');
+//    $role->remove_cap('delete_msis_29');
+//    $role->remove_cap('edit_msis_29');
+//    $role->remove_cap('publish_msis_29');
+//    $role->remove_cap('read_private_msis_29');
+    $role->remove_cap('read_post');
+    $role->remove_cap('edit_post');
+    $role->remove_cap('delete_post');
+    $role->remove_cap('edit_posts');
+    $role->remove_cap('publish_post');
+    $role->remove_cap('read_private_post');
+    //$role->add_cap('edit_badanie');
+    //$role->add_cap('edit_badania');
+    //$role->add_cap('edit_other_badania');
+    //$role->add_cap('publish_badania');
+    //$role->add_cap('read_badania');
+    //$role->add_cap('read_private_badania');
+    //$role->add_cap('delete_badania');
+    //$role->add_cap('read_book');
+    //$role->add_cap('delete_book');
+    //$role->add_cap('edit_books');
+    //$role->add_cap('edit_others_books');
+    //$role->add_cap('publish_books');
+    //$role->add_cap('read_private_books');
+    //$role->add_cap('edit_books');
+}
+
+
+
+if ( !current_user_can( 'pacjent') ) {
+    add_action( 'admin_bar_menu', 'wpse126922_remove_newpost', 999 );
+    add_action( 'admin_menu', 'hide_add_new');
+    add_action( 'load-post-new.php', 'disable_new_post' );
+}
+
+
+function wpse126922_remove_newpost($wp_admin_bar) {
+    $wp_admin_bar->remove_node('new-eq5d');
+    $wp_admin_bar->remove_node('new-msis_29');
+}
+function hide_add_new() {
+//    global $submenu;
+//    print "<pre>";
+//    print_r($submenu); exit;
+//    print "</pre>";
+
+//    remove_submenu_page( 'edit.php?post_type=msis_29', 'post-new.php?post_type=msis_29' );
+//    remove_submenu_page( 'edit.php?post_type=eq5d', 'post-new.php?post_type=eq5d' );
+//    remove_submenu_page( 'edit.php?post_type=eq5d', 'post-new.php?post_type=eq5d' );
+//    unset($submenu['post-new.php?post_type=eq5d']);
+//    unset($submenu['post-new.php?post_type=msis_29'][10]);
+
+}
+function disable_new_post() {
+    if ( get_current_screen()->post_type == 'eq5d' )
+        wp_die( "Ankiety EQ-5D są przeznaczone do indywidualnego wypełniania przez pacjentów." );
+    if ( get_current_screen()->post_type == 'msis_29' )
+        wp_die( "Ankiety MSIS-29 one przeznaczone do indywidualnego wypełniania przez pacjentów." );
+}
+
 $role = get_role( 'administrator' );
 if ( !empty ($role) ){
 
@@ -65,27 +135,13 @@ if ( !empty ($role) ){
     $role->add_cap('publish_msis_29');
     $role->add_cap('delete_msis_29');
 
-    $role->add_cap( 'edit_msis_29' );
-    $role->add_cap( 'delete_msis_29' );
-//
-
-
     $role->add_cap('read_eq5d');
     $role->add_cap('edit_eq5d');
-//    $role->add_cap('publish_eq5d');
+    $role->add_cap('publish_eq5d');
     $role->add_cap('edit_eq5ds');
     $role->add_cap('delete_eq5d');
     $role->add_cap('read_private_eq5d');
     $role->add_cap('edit_others_eq5d');
-
-//    $role->remove_cap('read_msis_29');
-//    $role->remove_cap('edit_msis_29');
-//    $role->remove_cap('edit_msis_29');
-//    $role->remove_cap('delete_msis_29');
-//    $role->remove_cap('edit_msis_29');
-//    $role->remove_cap('publish_msis_29');
-//    $role->remove_cap('read_private_msis_29');
-
 
     $role->remove_cap('read_post');
     $role->remove_cap('edit_post');
@@ -93,24 +149,44 @@ if ( !empty ($role) ){
     $role->remove_cap('edit_posts');
     $role->remove_cap('publish_post');
     $role->remove_cap('read_private_post');
-
-
-    //$role->add_cap('edit_badanie');
-    //$role->add_cap('edit_badania');
-    //$role->add_cap('edit_other_badania');
-    //$role->add_cap('publish_badania');
-    //$role->add_cap('read_badania');
-    //$role->add_cap('read_private_badania');
-    //$role->add_cap('delete_badania');
-
-    //$role->add_cap('read_book');
-    //$role->add_cap('delete_book');
-    //$role->add_cap('edit_books');
-    //$role->add_cap('edit_others_books');
-    //$role->add_cap('publish_books');
-    //$role->add_cap('read_private_books');
-    //$role->add_cap('edit_books');
-
+    $role->remove_cap('edit_others_post');
+    $role->remove_cap('manage_categories');
+    $role->remove_cap('edit_others_post');
+    $role->remove_cap('delete_others_posts');
+    $role->remove_cap('delete_others_pages');
+    $role->remove_cap('delete_private_pages');
+    $role->remove_cap('delete_private_posts');
+//    $role->remove_cap('delete_pages');
+    $role->remove_cap('delete_posts');
+//    $role->remove_cap('delete_published_pages');
+    $role->remove_cap('delete_published_posts');
+    $role->remove_cap('edit_others_post');
+//    $role->remove_cap('edit_pages');
+    $role->remove_cap('edit_posts');
+//    $role->remove_cap('edit_private_pages');
+    $role->remove_cap('edit_private_posts');
+//    $role->remove_cap('edit_published_pages');
+    $role->remove_cap('edit_published_posts');
+//    $role->remove_cap('read_private_pages');
+    $role->remove_cap('read_private_posts');
+//                'delete_others_posts'=> true,
+//                'delete_private_pages'=> true,
+//                'delete_private_posts' => true,
+//                'delete_pages'=> true,
+//                'delete_posts'=> true,
+//                'delete_published_pages'=> true,
+//                'delete_published_posts'=> true,
+//                'edit_others_pages'=> true,
+//                'edit_others_posts'=> true,
+//                'edit_pages'=> true,
+//                'edit_posts'=> true,
+//                'edit_private_pages'=> true,
+//                'edit_private_posts'=> true,
+//                'edit_published_pages'=> true,
+//                'edit_published_posts'=> true,
+//                'manage_categories'=> true,
+//                'read_private_pages'=> true,
+//                'read_private_posts'=> true,
 }
 
 
@@ -161,7 +237,7 @@ update_option( 'users_can_register', '1');
 //    );
 
 //    foreach ( $caps as $cap ) {
-    
+
 //        // Remove the capability.
 //        $editor->remove_cap( $cap );
 //    }

@@ -34,70 +34,15 @@ function rejsm_css_add_style(){
     //add_filter( 'wpcf7_support_html5_fallback', '__return_true' );
 }
 //add_action( 'admin_enqueue_scripts', 'rejsm_pesel_verification');
-if ( ! current_user_can('administrator') && ! current_user_can('lekarz') ) { //nie wyświetlaj danych demograficznych dla administratora, W PRZYSZŁOŚCI DODAJ LEKARZA
+if ( current_user_can('pacjent') ) {
     add_action( 'profile_personal_options', 'rejsm_display_danedemograficzne_metadata' ); //dodaje treść za sekcją personalizacja
 }
-//
-
-
-//function lista_zmiennych (){
-//    $lista = array(
-//
-//        array( 'Płeć', 'plec'),
-//        array( 'Przebieg choroby', 'przebieg_choroby'),
-//        array( 'Data pierwszych objawów','data_pierwszych_objawow'),
-//        array( 'Data rozpoznania choroby', 'data_rozpoznania_choroby' ),
-//        array( 'Badanie MRI', 'badanie_mri'),
-//        array( 'Badanie płynu mózgowo-rdzeniowego', 'badanie_plynu'),
-//        array( 'Leczenie immunomodulujące', 'leczenie_immunomodulujace'),
-//        array( 'Leczenie objawowe', 'leczenie_objawowe'),
-//        array( 'Zatrudnienie / praca', 'praca'),
-//        array( 'Dochód z pracy', 'dochod'),
-//
-//        array( 'Miejsce zamieszkania', 'miejsce_zamieszkania'),
-//        array( 'Województwo', 'wojewodztwo'),
-//        array( 'Ręczność', 'recznosc'),
-//        array( 'Porody', 'porody'),
-//        array( 'Wykształcenie', 'wyksztalcenie'),
-//        array( 'Stan rodzinny', 'stan_rodzinny'),
-//        array( 'SM w rodzinie', 'sm_w_rodzinie'),
-//        array( 'Data Zgonu', 'data_zgonu'),
-//
-//    );
-//    return $lista;
+//if (! current_user_can('pacjent') ) {
+    add_action('edit_user_profile', 'rejsm_display_danedemograficzne_metadata');
 //}
-//
-//function wybory(){
-//    $wybor = array(
-//
-//        array('',''),
-//    );
-//    return $wybor;
-//}
-
-
-add_action( 'edit_user_profile', 'rejsm_display_danedemograficzne_metadata' );
 function rejsm_display_danedemograficzne_metadata( $user ){
-
-//    $userid = $user->ID;
-//    $a = lista_zmiennych();
-//    $user_meta = array();
-//    for ($i = 0; $i < count($a); $i++){
-//        $user_meta[$i] = get_user_meta( $userid, $a[$i][1], true );
-//
-//    }
-//    for ($i = 0; $i < count($a); $i++){
-//        echo $a[$i][0];
-//        echo $user_meta[$i];
-//        echo '<BR>';
-//    }
-//
-//
-
-
-
     $userrole = $user->roles;
- //   if ($userrole == 'pacjent')
+    if ($userrole[0] == 'pacjent')
     {
         $userid = $user->ID;
         $user_info = get_userdata(1);
@@ -136,7 +81,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <td>
                     <select id="plec" name="key_plec" disabled>
                         <?php if ($plec == 0) { ?>
-                            <option disabled selected value ></option>
+                            <option disabled selected value></option>
                         <?php } else if ($plec == 1) { ?>
                             <option value="1"> Kobieta</option>
                         <?php } else if ($plec == 2) { ?>
@@ -149,7 +94,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Przebieg choroby</th>
                 <td>
                     <select id="przebieg_choroby" name="key_przebieg_choroby">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $przebieg_choroby); ?>>Rzutowo-remisyjna</option>
                         <option value="2" <?php selected('2', $przebieg_choroby); ?>>Wtórnie-postępująca</option>
                         <option value="3" <?php selected('3', $przebieg_choroby); ?>>Pierwotnie-postępująca</option>
@@ -161,21 +106,21 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Data pierwszych objawów (miesiąc / rok)</th>
                 <td>
                     <input id="data_pierwszych_objawow" type="text" class="MyDate" name="key_data_pierwszych_objawow"
-                           value="<?php echo $data_pierwszych_objawow; ?>" />
+                           value="<?php echo $data_pierwszych_objawow; ?>"/>
                 </td>
             </tr>
             <tr>
                 <th scope="row">Data rozpoznania choroby (miesiąc / rok</th>
                 <td>
                     <input id="data_rozpoznania_choroby" type="text" class="MyDate" name="key_data_rozpoznania_choroby"
-                           value="<?php echo $data_rozpoznania_choroby; ?>" />
+                           value="<?php echo $data_rozpoznania_choroby; ?>"/>
                 </td>
             </tr>
             <tr>
                 <th scope="row">Badanie MRI</th>
                 <td>
                     <select id="badanie_mri" name="key_badanie_mri">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $badanie_mri); ?>>Tak</option>
                         <option value="2" <?php selected('2', $badanie_mri); ?>>Nie</option>
                     </select>
@@ -185,7 +130,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Badanie płynu mózgowo-rdzeniowego</th>
                 <td>
                     <select id="badanie_plynu" name="key_badanie_plynu">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $badanie_plynu); ?>>Tak</option>
                         <option value="2" <?php selected('2', $badanie_plynu); ?>>Nie</option>
                     </select>
@@ -195,7 +140,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Leczenie immunomodulujące</th>
                 <td>
                     <select id="leczenie_immunomodulujace" name="key_leczenie_immunomodulujace">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $leczenie_immunomodulujace); ?>>Obecnie</option>
                         <option value="2" <?php selected('2', $leczenie_immunomodulujace); ?>>W przeszłości</option>
                     </select>
@@ -205,7 +150,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Leczenie objawowe</th>
                 <td>
                     <select id="leczenie_objawowe" name="key_leczenie_objawowe">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $leczenie_objawowe); ?>>Obecnie</option>
                         <option value="2" <?php selected('2', $leczenie_objawowe); ?>>W przeszłości</option>
                     </select>
@@ -215,7 +160,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 <th scope="row">Zatrudnienie / praca</th>
                 <td>
                     <select id="zatrudnienie" name="key_zatrudnienie">
-                        <option disabled selected value ></option>
+                        <option disabled selected value></option>
                         <option value="1" <?php selected('1', $zatrudnienie); ?>>Nie pracuje</option>
                         <option value="2" <?php selected('2', $zatrudnienie); ?>>Pracuje</option>
                         <option value="3" <?php selected('3', $zatrudnienie); ?>>Renta</option>
@@ -224,132 +169,138 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 </td>
             </tr>
 
-            <tr id = "row-hide" <?php if ($zatrudnienie != "2") { ?> style="display:none" <?php } else {};?> >
-                    <th scope="row">Dochód z pracy</th>
-                    <td>
-                        <select id="praca_dochod" name="key_praca_dochod">
-                            <option disabled selected value ></option>
-                            <option value="1" <?php selected('1', $praca_dochod); ?>>Tak</option>
-                            <option value="2" <?php selected('2', $praca_dochod); ?>>Nie</option>
-                        </select>
-                    </td>
+            <tr id="row-hide" <?php if ($zatrudnienie != "2") { ?> style="display:none" <?php } else {
+            }; ?> >
+                <th scope="row">Dochód z pracy</th>
+                <td>
+                    <select id="praca_dochod" name="key_praca_dochod">
+                        <option disabled selected value></option>
+                        <option value="1" <?php selected('1', $praca_dochod); ?>>Tak</option>
+                        <option value="2" <?php selected('2', $praca_dochod); ?>>Nie</option>
+                    </select>
+                </td>
             </tr>
 
         </table>
         <h2>Dane demograficzne</h2>
         <table class="form-table">
-        <tr>
-            <th scope="row">Miejsce zamieszkania</th>
-            <td>
-                <select id="miejsce_zamieszkania" name="key_miejsce_zamieszkania">
-                    <option disabled selected value ></option>
-                    <option value="1" <?php selected('1', $miejsce_zamieszkania); ?>>Miasto</option>
-                    <option value="2" <?php selected('2', $miejsce_zamieszkania); ?>>Wieś</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">Województwo</th>
-            <td>
-                <select id="wojewodztwo" name="key_wojewodztwo">
-                    <option disabled selected value ></option>
-                    <option value="1" <?php selected('1', $wojewodztwo); ?>>dolnośląskie</option>
-                    <option value="2" <?php selected('2', $wojewodztwo); ?>>kujawsko-pomorskie</option>
-                    <option value="3" <?php selected('3', $wojewodztwo); ?>>lubelskie</option>
-                    <option value="4" <?php selected('4', $wojewodztwo); ?>>lubuskie</option>
-                    <option value="5" <?php selected('5', $wojewodztwo); ?>>łódzkie</option>
-                    <option value="6" <?php selected('6', $wojewodztwo); ?>> małopolskie</option>
-                    <option value="7" <?php selected('7', $wojewodztwo); ?>>mazowieckie</option>
-                    <option value="8" <?php selected('8', $wojewodztwo); ?>>opolskie</option>
-                    <option value="9" <?php selected('9', $wojewodztwo); ?>>podkarpackie</option>
-                    <option value="10" <?php selected('10', $wojewodztwo); ?>>podlaskie</option>
-                    <option value="11" <?php selected('11', $wojewodztwo); ?>>pomorskie</option>
-                    <option value="12" <?php selected('12', $wojewodztwo); ?>>śląskie</option>
-                    <option value="13" <?php selected('13', $wojewodztwo); ?>>świętokrzyskie</option>
-                    <option value="14" <?php selected('14', $wojewodztwo); ?>>warmińsko-mazurskie</option>
-                    <option value="15" <?php selected('15', $wojewodztwo); ?>>wielkopolskie</option>
-                    <option value="16" <?php selected('16', $wojewodztwo); ?>>zachodniopomorskie</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">Ręczność</th>
-            <td>
-                <select id="recznosc" name="key_recznosc">
-                    <option disabled selected value ></option>
-                    <option value="1"<?php selected('1', $recznosc); ?>>Praworęczny</option>
-                    <option value="2"<?php selected('2', $recznosc); ?>>Leworęczny</option>
-                </select>
-            </td>
-        </tr>
-        <?php
-        if ($plec == 1) {
-            ?>
             <tr>
-                <th scope="row">Porody</th>
+                <th scope="row">Miejsce zamieszkania</th>
                 <td>
-                    <select id="porody" name="key_porody">
-                        <option disabled selected value ></option>
-                        <option value="1" <?php selected('1', $porody); ?>>0</option>
-                        <option value="2" <?php selected('2', $porody); ?>>1</option>
-                        <option value="3" <?php selected('3', $porody); ?>>2</option>
-                        <option value="4" <?php selected('4', $porody); ?>>3 lub więcej</option>
-                        </option>
+                    <select id="miejsce_zamieszkania" name="key_miejsce_zamieszkania">
+                        <option disabled selected value></option>
+                        <option value="1" <?php selected('1', $miejsce_zamieszkania); ?>>Miasto</option>
+                        <option value="2" <?php selected('2', $miejsce_zamieszkania); ?>>Wieś</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Województwo</th>
+                <td>
+                    <select id="wojewodztwo" name="key_wojewodztwo">
+                        <option disabled selected value></option>
+                        <option value="1" <?php selected('1', $wojewodztwo); ?>>dolnośląskie</option>
+                        <option value="2" <?php selected('2', $wojewodztwo); ?>>kujawsko-pomorskie</option>
+                        <option value="3" <?php selected('3', $wojewodztwo); ?>>lubelskie</option>
+                        <option value="4" <?php selected('4', $wojewodztwo); ?>>lubuskie</option>
+                        <option value="5" <?php selected('5', $wojewodztwo); ?>>łódzkie</option>
+                        <option value="6" <?php selected('6', $wojewodztwo); ?>> małopolskie</option>
+                        <option value="7" <?php selected('7', $wojewodztwo); ?>>mazowieckie</option>
+                        <option value="8" <?php selected('8', $wojewodztwo); ?>>opolskie</option>
+                        <option value="9" <?php selected('9', $wojewodztwo); ?>>podkarpackie</option>
+                        <option value="10" <?php selected('10', $wojewodztwo); ?>>podlaskie</option>
+                        <option value="11" <?php selected('11', $wojewodztwo); ?>>pomorskie</option>
+                        <option value="12" <?php selected('12', $wojewodztwo); ?>>śląskie</option>
+                        <option value="13" <?php selected('13', $wojewodztwo); ?>>świętokrzyskie</option>
+                        <option value="14" <?php selected('14', $wojewodztwo); ?>>warmińsko-mazurskie</option>
+                        <option value="15" <?php selected('15', $wojewodztwo); ?>>wielkopolskie</option>
+                        <option value="16" <?php selected('16', $wojewodztwo); ?>>zachodniopomorskie</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Ręczność</th>
+                <td>
+                    <select id="recznosc" name="key_recznosc">
+                        <option disabled selected value></option>
+                        <option value="1"<?php selected('1', $recznosc); ?>>Praworęczny</option>
+                        <option value="2"<?php selected('2', $recznosc); ?>>Leworęczny</option>
                     </select>
                 </td>
             </tr>
             <?php
-        }
-        ?>
-        <tr>
-            <th scope="row">Wykształcenie</th>
-            <td>
-                <select id="wyksztalcenie" name="key_wyksztalcenie">
-                    <option disabled selected value ></option>
-                    <option value="1" <?php selected('1', $wyksztalcenie); ?>>Podstawowe</option>
-                    <option value="2" <?php selected('2', $wyksztalcenie); ?>>Średnie</option>
-                    <option value="3" <?php selected('3', $wyksztalcenie); ?>>Wyższe</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">Stan rodzinny</th>
-            <td>
-                <select id="stan_rodzinny" name="key_stan_rodzinny">
-                    <option disabled selected value ></option>
-                    <option value="1" <?php selected('1', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Panna'; else if ($plec == 2) echo 'Kawaler'; ?></option>
-                    <option value="2" <?php selected('2', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Zamężna'; else if ($plec == 2) echo 'Żonaty'; ?></option>
-                    <option value="3" <?php selected('3', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Rozwiedziona'; else if ($plec == 2) echo 'Rozwiedziony'; ?></option>
-                    <option value="4" <?php selected('4', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Wdowa'; else if ($plec == 2) echo 'Wdowiec'; ?></option>
-                </select>
-            </td>
-        </tr>
-
-        <tr>
-            <th scope="row">SM w rodzinie</th>
-            <td>
-                <select id="sm_w_rodzinie" name="key_sm_w_rodzinie">
-                    <option disabled selected value ></option>
-                    <option value="1" <?php selected('1', $sm_w_rodzinie); ?>>Tak</option>
-                    <option value="2" <?php selected('2', $sm_w_rodzinie); ?>>Nie</option>
-                </select>
-            </td>
-        </tr>
-        <?php
-            if (get_role($userid) == 'pacjent') {
-        ?>
+            if ($plec == 1) {
+                ?>
+                <tr>
+                    <th scope="row">Porody</th>
+                    <td>
+                        <select id="porody" name="key_porody">
+                            <option disabled selected value></option>
+                            <option value="1" <?php selected('1', $porody); ?>>0</option>
+                            <option value="2" <?php selected('2', $porody); ?>>1</option>
+                            <option value="3" <?php selected('3', $porody); ?>>2</option>
+                            <option value="4" <?php selected('4', $porody); ?>>3 lub więcej</option>
+                            </option>
+                        </select>
+                    </td>
+                </tr>
+                <?php
+            }
+            ?>
             <tr>
-                <th scope="row">Data Zgonu</th>
+                <th scope="row">Wykształcenie</th>
                 <td>
-                    <input type="text" id="data_zgonu" class="MyDate" name="key_data_zgonu" value="<?php echo $data_zgonu; ?>" />
-                    <span class="description">yyyy-mm</span>
+                    <select id="wyksztalcenie" name="key_wyksztalcenie">
+                        <option disabled selected value></option>
+                        <option value="1" <?php selected('1', $wyksztalcenie); ?>>Podstawowe</option>
+                        <option value="2" <?php selected('2', $wyksztalcenie); ?>>Średnie</option>
+                        <option value="3" <?php selected('3', $wyksztalcenie); ?>>Wyższe</option>
+                    </select>
                 </td>
             </tr>
-        <?php
+            <tr>
+                <th scope="row">Stan rodzinny</th>
+                <td>
+                    <select id="stan_rodzinny" name="key_stan_rodzinny">
+                        <option disabled selected value></option>
+                        <option
+                            value="1" <?php selected('1', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Panna'; else if ($plec == 2) echo 'Kawaler'; ?></option>
+                        <option
+                            value="2" <?php selected('2', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Zamężna'; else if ($plec == 2) echo 'Żonaty'; ?></option>
+                        <option
+                            value="3" <?php selected('3', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Rozwiedziona'; else if ($plec == 2) echo 'Rozwiedziony'; ?></option>
+                        <option
+                            value="4" <?php selected('4', $stan_rodzinny); ?>><?php if ($plec == 1) echo 'Wdowa'; else if ($plec == 2) echo 'Wdowiec'; ?></option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <th scope="row">SM w rodzinie</th>
+                <td>
+                    <select id="sm_w_rodzinie" name="key_sm_w_rodzinie">
+                        <option disabled selected value></option>
+                        <option value="1" <?php selected('1', $sm_w_rodzinie); ?>>Tak</option>
+                        <option value="2" <?php selected('2', $sm_w_rodzinie); ?>>Nie</option>
+                    </select>
+                </td>
+            </tr>
+            <?php
+            if (get_role($userid) == 'pacjent') {
+                ?>
+                <tr>
+                    <th scope="row">Data Zgonu</th>
+                    <td>
+                        <input type="text" id="data_zgonu" class="MyDate" name="key_data_zgonu"
+                               value="<?php echo $data_zgonu; ?>"/>
+                        <span class="description">yyyy-mm</span>
+                    </td>
+                </tr>
+                <?php
             }
-        ?>
+            ?>
         </table>
-    <?php
+        <?php
     }
 }
 
@@ -441,4 +392,53 @@ function rejsm_update_dane_demograficzne_metadata( $userid ) {
         update_user_meta( $userid, 'leczenie_objawowe', $var_leczenie_objawowe);
     }
 }
+
+//function lista_zmiennych (){
+//    $lista = array(
+//
+//        array( 'Płeć', 'plec'),
+//        array( 'Przebieg choroby', 'przebieg_choroby'),
+//        array( 'Data pierwszych objawów','data_pierwszych_objawow'),
+//        array( 'Data rozpoznania choroby', 'data_rozpoznania_choroby' ),
+//        array( 'Badanie MRI', 'badanie_mri'),
+//        array( 'Badanie płynu mózgowo-rdzeniowego', 'badanie_plynu'),
+//        array( 'Leczenie immunomodulujące', 'leczenie_immunomodulujace'),
+//        array( 'Leczenie objawowe', 'leczenie_objawowe'),
+//        array( 'Zatrudnienie / praca', 'praca'),
+//        array( 'Dochód z pracy', 'dochod'),
+//
+//        array( 'Miejsce zamieszkania', 'miejsce_zamieszkania'),
+//        array( 'Województwo', 'wojewodztwo'),
+//        array( 'Ręczność', 'recznosc'),
+//        array( 'Porody', 'porody'),
+//        array( 'Wykształcenie', 'wyksztalcenie'),
+//        array( 'Stan rodzinny', 'stan_rodzinny'),
+//        array( 'SM w rodzinie', 'sm_w_rodzinie'),
+//        array( 'Data Zgonu', 'data_zgonu'),
+//
+//    );
+//    return $lista;
+//}
+//
+//function wybory(){
+//    $wybor = array(
+//
+//        array('',''),
+//    );
+//    return $wybor;
+//}
+//    $userid = $user->ID;
+//    $a = lista_zmiennych();
+//    $user_meta = array();
+//    for ($i = 0; $i < count($a); $i++){
+//        $user_meta[$i] = get_user_meta( $userid, $a[$i][1], true );
+//
+//    }
+//    for ($i = 0; $i < count($a); $i++){
+//        echo $a[$i][0];
+//        echo $user_meta[$i];
+//        echo '<BR>';
+//    }
+//
+//
 ?>

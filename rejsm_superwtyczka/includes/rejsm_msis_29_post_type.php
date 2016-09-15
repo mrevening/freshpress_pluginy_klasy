@@ -1,57 +1,54 @@
 <?php
 //***********************                   tworzenie ankiety MSIS_29 
-
-
 add_action( 'init', 'codex_msis_29_init' );
 function codex_msis_29_init() {
-	$labels = array(
-		'name'               => _x( 'Ankieta MSIS-29', 'post type general name', 'your-plugin-textdomain' ),
-		'singular_name'      => _x( 'Ankieta', 'post type singular name', 'your-plugin-textdomain' ),
-		'menu_name'          => _x( 'Ankiety MSIS-29', 'admin menu', 'your-plugin-textdomain' ),
-		'name_admin_bar'     => _x( 'Ankietę MSIS-29', 'add new on admin bar', 'your-plugin-textdomain' ),
-		'add_new'            => _x( 'Dodaj nową ankietę', 'book', 'your-plugin-textdomain' ),
-		'add_new_item'       => __( 'Wypełnij nową ankietę MSIS 29', 'your-plugin-textdomain' ),
-		'new_item'           => __( 'Nowa ankieta', 'your-plugin-textdomain' ),
-		'edit_item'          => __( 'Edytuj ankietę', 'your-plugin-textdomain' ),
-		'view_item'          => __( 'Zobacz ankietę', 'your-plugin-textdomain' ),
-		'all_items'          => __( 'Wszystkie ankiety', 'your-plugin-textdomain' ),
-		'search_items'       => __( 'Szukaj ankiety', 'your-plugin-textdomain' ),
-		'parent_item_colon'  => __( 'Parent Books:', 'your-plugin-textdomain' ),
-		'not_found'          => __( 'Nie znaleziono ankiety.', 'your-plugin-textdomain' ),
-		'not_found_in_trash' => __( 'Nie znaleziono ankiety w koszu.', 'your-plugin-textdomain' ),
-	);
-
-	$args = array(
-		'labels'             => $labels,
+    $labels = array(
+        'name'               => _x( 'Ankieta MSIS-29', 'post type general name', 'your-plugin-textdomain' ),
+        'singular_name'      => _x( 'Ankieta', 'post type singular name', 'your-plugin-textdomain' ),
+        'menu_name'          => _x( 'Ankiety MSIS-29', 'admin menu', 'your-plugin-textdomain' ),
+        'name_admin_bar'     => _x( 'Ankietę MSIS-29', 'add new on admin bar', 'your-plugin-textdomain' ),
+        'add_new'            => _x( 'Dodaj nową ankietę', 'book', 'your-plugin-textdomain' ),
+        'add_new_item'       => __( 'Wypełnij nową ankietę MSIS 29', 'your-plugin-textdomain' ),
+        'new_item'           => __( 'Nowa ankieta', 'your-plugin-textdomain' ),
+        'edit_item'          => __( 'Edytuj ankietę', 'your-plugin-textdomain' ),
+        'view_item'          => __( 'Zobacz ankietę', 'your-plugin-textdomain' ),
+        'all_items'          => __( 'Wszystkie ankiety', 'your-plugin-textdomain' ),
+        'search_items'       => __( 'Szukaj ankiety', 'your-plugin-textdomain' ),
+        'parent_item_colon'  => __( 'Parent Books:', 'your-plugin-textdomain' ),
+        'not_found'          => __( 'Nie znaleziono ankiety.', 'your-plugin-textdomain' ),
+        'not_found_in_trash' => __( 'Nie znaleziono ankiety w koszu.', 'your-plugin-textdomain' ),
+    );
+    $args = array(
+        'labels'             => $labels,
         'description'        => __( 'Skala wpływu stwardnienia rozsianego (MSIS-29).', 'your-plugin-textdomain' ),
-		'public'             => false, //it's not public, it shouldn't have it's own permalink, and so on
+        'public'             => false, //it's not public, it shouldn't have it's own permalink, and so on
         'exclude_from_search'=> true, // you should exclude it from search results
-		'publicly_queryable' => false, // you should be able to query it
-		'show_ui'            => true, // you should be able to edit it in wp-admin
-		'show_in_menu'       => true,
+        'publicly_queryable' => false, // you should be able to query it
+        'show_ui'            => true, // you should be able to edit it in wp-admin
+        'show_in_menu'       => true,
         'show_in_nav_menus'  => false,  // you shouldn't be able to add it to menus
         'show_in_admin_bar'  => true,
         'menu_position'      => 101,
         'menu_icon'          => 'dashicons-clipboard',
-		'query_var'          => false,
-		'rewrite'            => false,
-		'capability_type'    => 'post',
-		'hierarchical'       => false,
+        'query_var'          => false,
+        'rewrite'            => false,
+        'capability_type'    => 'post',
+        'hierarchical'       => false,
         'has_archive'        => false,  // it shouldn't have archive page
         'rewrite'            => false,  // it shouldn't have rewrite rules
         'capabilities'       => array(
-              'read_post'          => 'read_msis_29', 
-              'edit_post'          => 'edit_msis_29', 
-              'edit_posts'         => 'edit_msis_29s', 
-              'delete_posts'       => 'delete_msis_29',
-              'edit_others_posts'  => 'edit_others_msis_29', 
-              'publish_posts'      => 'publish_msis_29',       
-              'read_private_posts' => 'read_private_msis_29', 
-              'create_posts'       => 'edit_msis_29', 
+            'read_post'          => 'read_msis_29',
+            'edit_post'          => 'edit_msis_29',
+            'edit_posts'         => 'edit_msis_29s',
+            'delete_posts'       => 'delete_msis_29',
+            'edit_others_posts'  => 'edit_others_msis_29',
+            'publish_posts'      => 'publish_msis_29',
+            'read_private_posts' => 'read_private_msis_29',
+            'create_posts'       => 'edit_msis_29',
         ),
-		'supports'           => array( '' ),
-	);
-	register_post_type( 'msis_29', $args );
+        'supports'           => array( '' ),
+    );
+    register_post_type( 'msis_29', $args );
 }
 
 
@@ -357,7 +354,6 @@ function register_kategoria_msis_29_taxonomy() {
 		'show_ui'           => true,
 		'show_admin_column' => true,
 		'meta_box_cb'       => 'wynik_msis_29_meta_box',
-        'show_ui'           => true,
         'show_admin_column ' => true,
 	);
 	register_taxonomy( 'kategoria_msis_29', 'msis_29', $args );
