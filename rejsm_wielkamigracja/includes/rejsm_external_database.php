@@ -24,6 +24,8 @@ class CustomDatabase
             echo $e->getMessage();
         }
     }
+
+
     private function randomPassword() {
         $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';//!@#$%^&*()_+=-[]}{;:/.,<>?';
         $pass = array(); //remember to declare $pass as an array
@@ -54,7 +56,7 @@ class CustomDatabase
     public function create_users_from_dane_demograficzne ()
     {
         $sql = "SELECT Pesel, Plec, MiejsceZamieszkania, Wojewodztwo, Recznosc, Porody, Wyksztalcenie, StanRodzinny, Zatrudnienie,
-                        SMwRodzinie, Inicjaly, PracaZarobek, Data_zgonu, Deleted FROM danedemograficzne Limit 10";//WHERE PESEL = ".$row_dane->{'PESEL'};
+                        SMwRodzinie, Inicjaly, PracaZarobek, Data_zgonu, Deleted FROM danedemograficzne Limit 1";//WHERE PESEL = ".$row_dane->{'PESEL'};
         $dane = $this->db->get_results($sql, OBJECT);
         if ($this->db->last_error) {
             echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
@@ -84,15 +86,42 @@ class CustomDatabase
                 add_user_meta($user_created_new_id, 'praca_dochod', $row->{'PracaZarobek'});
                 add_user_meta($user_created_new_id, 'sm_w_rodzinie', $row->{'SMwRodzinie'});
                 add_user_meta($user_created_new_id, 'data_zgonu', $row->{'Data_zgonu'});
+
+
+                $sql = "SELECT * FROM wywiad WHERE PESEL = ".$row->{'Pesel'};
+                $wywiad = $this->db->get_row($sql, OBJECT);
+//                echo $sql;
+//                if(is_object($wywiad)) echo 'obiekt'; else echo 'nieobiekt';
+//                if(is_array($wywiad)) echo 'array'; else echo 'niearray';
+                if ($this->db->last_error) {
+                    echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
+                return new WP_Error('broke', __("Błąd podczas pobierania metadanych. "));
+            }
+//                var_dump( $wywiad);
+//                echo $wywiad;
+                add_user_meta($user_created_new_id, 'pierwsze_objawy', $wywiad->{'PierwszeObjawy'});
+                add_user_meta($user_created_new_id, 'pierwsze_objawy_data', $wywiad->{'PierwszeObjawyData'});
+                add_user_meta($user_created_new_id, 'diagnozaSM', $wywiad->{'DiagnozaSM'});
+                add_user_meta($user_created_new_id, 'zapalenie_nerwow_wzrokowych', $wywiad->{'ZapalenieNerwowWzrokowych'});
+                add_user_meta($user_created_new_id, 'nadcisnienie_tetnicze', $wywiad->{'NadcisnienieTetnicze'});
+                add_user_meta($user_created_new_id, 'cukrzyca', $wywiad->{'Cukrzyca'});
+                add_user_meta($user_created_new_id, 'tarczyca', $wywiad->{'Tarczyca'});
+                add_user_meta($user_created_new_id, 'zakrzepowozatorowe', $wywiad->{'ZakrzepowoZatorowe'});
+                add_user_meta($user_created_new_id, 'nowotwory', $wywiad->{'Nowotwory'});
+                add_user_meta($user_created_new_id, 'postacSM', $wywiad->{'PostacSM'});
+                add_user_meta($user_created_new_id, 'kryterium_McDonald', $wywiad->{'KryteriumMcDonald'});
             }
             echo "</BR>";
+
+
+
         }
         echo "</BR>";
     }
 
     public function create_users_from_patients() {
 
-        $sql = "SELECT PESEL, email, password FROM patients ORDER BY PESEL ASC LIMIT 10";
+        $sql = "SELECT PESEL, email, password FROM patients ORDER BY PESEL ASC LIMIT 1";
         $dane_patient = $this->db->get_results($sql, OBJECT);
         if ($this->db->last_error) {
             echo "Błąd podczas pobierania metadanych z modulu pacjenta. ";
@@ -305,8 +334,8 @@ class CustomDatabase
 }
 $Custom_DB = new CustomDatabase;
 $Custom_DB->create_users_from_patients();
-$Custom_DB->create_users_from_dane_demograficzne();
-$Custom_DB->create_lekarze_from_users();
+//$Custom_DB->create_users_from_dane_demograficzne();
+//$Custom_DB->create_lekarze_from_users();
 if ( is_wp_error( $Custom_DB )) {
     echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
 }

@@ -1,7 +1,7 @@
 <?php
 //***********************                   tworzenie ankiety MSIS_29 
-add_action( 'init', 'codex_msis_29_init' );
-function codex_msis_29_init() {
+add_action( 'init', 'rejsm_msis_29_init' );
+function rejsm_msis_29_init() {
     $labels = array(
         'name'               => _x( 'Ankieta MSIS-29', 'post type general name', 'your-plugin-textdomain' ),
         'singular_name'      => _x( 'Ankieta', 'post type singular name', 'your-plugin-textdomain' ),
@@ -124,6 +124,7 @@ function rejsm_msis_29_add_metabox_2( $post ) {
 function rejsm_msis_29_add_metabox_3( $post ) {
     print_msis_29($post, 13, 17);
 }
+
 //function rejsm_msis_29_add_publish_metabox ( $post) {
 //    ?>
 <!--    <div id="submit-div" class="postbox">-->

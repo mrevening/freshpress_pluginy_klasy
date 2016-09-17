@@ -21,11 +21,14 @@ ini_set('display_errors', 1);
 
 
 require_once dirname(__FILE__) . '/includes/rejsm_registration_form_customize.php';
-require_once dirname(__FILE__) . '/includes/rejsm_form_dane_demograficzne.php';
+//require_once dirname(__FILE__) . '/includes/rejsm_form_dane_demograficzne.php';
+require_once dirname(__FILE__) . '/includes/rejsm_all_user_info.php';
 require_once dirname(__FILE__) . '/includes/rejsm_custom_design.php';
 require_once dirname(__FILE__) . '/includes/rejsm_users_possibilities.php';
 require_once dirname(__FILE__) . '/includes/rejsm_msis_29_post_type.php';
 require_once dirname(__FILE__) . '/includes/rejsm_eq5d_post_type.php';
+
+
 //require_once dirname(__FILE__) . '/includes/rejsm_szpital_taxonomy_for_users.php';
 
 //require_once dirname(__FILE__) . '/includes/rejsm_user_taxonomy_szpital.php';

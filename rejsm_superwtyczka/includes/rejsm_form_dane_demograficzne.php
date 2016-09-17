@@ -73,6 +73,21 @@ function rejsm_display_danedemograficzne_metadata( $user ){
         $badanie_plynu = get_user_meta($userid, 'badanie_plynu', true);
         $leczenie_immunomodulujace = get_user_meta($userid, 'leczenie_immunomodulujace', true);
         $leczenie_objawowe = get_user_meta($userid, 'leczenie_objawowe', true);
+
+        $pierwsze_objawy = get_user_meta($userid, 'pierwsze_objawy', true);
+        $pierwsze_objawy_data = get_user_meta($userid, 'pierwsze_objawy_data', true);
+        $diagnozaSM = get_user_meta($userid, 'diagnozaSM', true);
+        $zapalenie_nerwow_wzrokowych = get_user_meta($userid, 'zapalenie_nerwow_wzrokowych', true);
+        $nadcisnienie_tetnicze = get_user_meta($userid, 'nadcisnienie_tetnicze', true);
+        $cukrzyca = get_user_meta($userid, 'cukrzyca', true);
+        $tarczyca = get_user_meta($userid, 'tarczyca', true);
+        $zakrzepowozatorowe = get_user_meta($userid, 'zakrzepowozatorowe', true);
+        $nowotwory = get_user_meta($userid, 'nowotwory', true);
+        $postacSM = get_user_meta($userid, 'postacSM', true);
+        $kryterium_McDonald = get_user_meta($userid, 'kryterium_McDonald', true);
+
+
+
         ?>
         <h2>EUReMS</h2>
         <table class="form-table">
@@ -103,7 +118,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 </td>
             </tr>
             <tr>
-                <th scope="row">Data pierwszych objawów (miesiąc / rok)</th>
+                    <th scope="row">Data pierwszych objawów (miesiąc / rok)</th>
                 <td>
                     <input id="data_pierwszych_objawow" type="text" class="MyDate" name="key_data_pierwszych_objawow"
                            value="<?php echo $data_pierwszych_objawow; ?>"/>
@@ -127,7 +142,7 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 </td>
             </tr>
             <tr>
-                <th scope="row">Badanie płynu mózgowo-rdzeniowego</th>
+                    <th scope="row">Badanie płynu mózgowo-rdzeniowego</th>
                 <td>
                     <select id="badanie_plynu" name="key_badanie_plynu">
                         <option disabled selected value></option>
@@ -298,9 +313,38 @@ function rejsm_display_danedemograficzne_metadata( $user ){
                 </tr>
                 <?php
             }
+//            print_r($_POST);
             ?>
         </table>
-        <?php
+
+<!--        --><?php //if ((current_user_can('lekarz')) || (current_user_can('administrator'))){  ?>
+<!--        <h2>Wywiad</h2>-->
+<!--        <table class="form-table">-->
+<!--        <tr>-->
+<!--            <th scope="row">Data pierwszych objawów</th>-->
+<!--            <td>-->
+<!--                <input type="text" id="data_pierwszych_objawow" class="MyDate" name="key_data_pierwszych_objawow"-->
+<!--                       value="--><?php //echo $data_pierwszych_objawow; ?><!--"/>-->
+<!--                <span class="description">yyyy-mm</span>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <th scope="row">Rodzaj pierwszych objawów</th>-->
+<!--            <td>-->
+<!--                <select id="pierwsze_objawy" name="key_pierwsze_objawy">-->
+<!--                    <option disabled selected value></option>-->
+<!--                    <option value="1" --><?php //selected('1', $pierwsze_objawy); ?><!-->wzrokowe</option>-->
+<!--                    <option value="2" --><?php //selected('2', $pierwsze_objawy); ?><!-->czuciowe</option>-->
+<!--                    <option value="3" --><?php //selected('2', $pierwsze_objawy); ?><!-->piramidowe</option>-->
+<!--                    <option value="4" --><?php //selected('2', $pierwsze_objawy); ?><!-->móżdżkowe</option>-->
+<!--                    <option value="5" --><?php //selected('2', $pierwsze_objawy); ?><!-->różne</option>-->
+<!--                </select>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!---->
+<!--        --><?php // }  ?>
+<!--        --><?php
+        print_r($_POST);
     }
 }
 
