@@ -10,26 +10,33 @@ function rejsm_display_metadata( $user ){
 
     $userrole = $user->roles;
     if ($userrole[0] == 'pacjent') {
-        $lista_nazw_demograficzne = get_lista_nazw_demograficzne();
-        $lista_nazw_eurems = get_lista_nazw_eurems();
-        $lista_wyborow_demograficzne = get_lista_wyborow_demograficzne();
-        $lista_wyborow_eurems = get_lista_wyborow_eurems();
 
-
-        foreach ($lista_nazw_demograficzne as $key => $nazwa) {
-            if (array_key_exists($key, $lista_wyborow_demograficzne)) $typ = 'drop-down'; else $typ = 'calendar';
-            new class_user_dane($user, $key, $nazwa, $typ, $lista_wyborow_demograficzne[$key]);
+        $tytuly = array('Dane demograficzne', 'EUREMS');
+        $lista_tytulow_i_typow=array();
+        $lista_wyborow=array();
+        foreach ($tytuly as $tytul){
+            switch ($tytul){
+                case 'Dane demograficzne':
+                    $lista_tytulow_i_typow = get_lista_tytulow_i_typow_demograficzne();
+                    $lista_wyborow = get_lista_wyborow_demograficzne();
+                    break;
+                case 'EUREMS':
+                    $lista_tytulow_i_typow = get_lista_tytulow_i_typow_eurems();
+                    $lista_wyborow = get_lista_wyborow_eurems();
+                    break;
+            }
+            foreach ($lista_tytulow_i_typow as $key => $value) {
+                new class_user_dane($user, $key, $value[0], $value[1], $lista_wyborow[$key]);
+            }
+            ?><h2><?php echo $tytul; ?></h2>
+            <table class="form-table"><?php
+            $lista_objektow = class_user_dane::get_lista_objektow();
+            foreach ($lista_objektow as $objekt) {
+                $objekt->print_it();
+            }
+            ?></table><?php
+            class_user_dane::reset_lista_objektow();
         }
-
-        ?><h2>EUReMS</h2>
-        <table class="form-table"><?php
-        $lista_objektow = class_user_dane::get_lista_objektow();
-        foreach ($lista_objektow as $objekt) {
-            if ($objekt->get_typ() == 'drop-down') $objekt->print_dropdown_list();
-            if ($objekt->get_typ() == 'calendar') $objekt->print_calendar();
-//            $objekt->get_user_meta_method();
-        }
-        ?></table><?php
     }
 }
 
@@ -38,7 +45,7 @@ add_action( 'personal_options_update', 'rejsm_update_metadata' );
 add_action( 'edit_user_profile_update', 'rejsm_update_metadata' );
 function rejsm_update_metadata( $userid ) {
 
-    $lista_nazw = get_lista_nazw();
+    $lista_nazw = get_wszyskie_tytuly();
     foreach ($lista_nazw as $nazwa => $value)
     if( isset( $_POST['key_'.$nazwa] ) ) {
         update_user_meta( $userid, $nazwa, $_POST['key_'.$nazwa]);
