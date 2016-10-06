@@ -19,7 +19,7 @@ class class_user_dane {
         <tr <?php echo $this->show_hide; ?>>
             <th scope="row"><?php echo $this->Nazwa ?></th>
             <td>
-                <select id="<?php echo $this->nazwa_id ?>" name="<?php echo 'key_'.$this->nazwa_id ?>">
+                <select id="<?php echo $this->nazwa_id ?>" class="drop-down" name="<?php echo 'key_'.$this->nazwa_id ?>">
                     <option disabled selected value></option>
                     <?php $i = 1; foreach ($this->wybory as $wybor) { ?>
                         <option value="<?php echo $i ?>"<?php selected($i, $this->metadata);?>><?php echo $wybor; $i++; ?></option>

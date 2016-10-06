@@ -1,0 +1,78 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>freshpress_pluginy</Name>
+    <ProjectGuid>{f71b589a-9af9-4052-b991-26b8a0948547}</ProjectGuid>
+    <RootNamespace>
+    </RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include=".idea\copyright\profiles_settings.xml" />
+    <Compile Include=".idea\misc.xml" />
+    <Compile Include=".idea\modules.xml" />
+    <Compile Include=".idea\plugins.iml" />
+    <Compile Include=".idea\vcs.xml" />
+    <Compile Include=".idea\workspace.xml" />
+    <Compile Include="rejsm_superwtyczka\includes\css\css_custom_post_type.css" />
+    <Compile Include="rejsm_superwtyczka\includes\css\css_style_dane_demograficzne.css" />
+    <Compile Include="rejsm_superwtyczka\includes\images\logo-login.png" />
+    <Compile Include="rejsm_superwtyczka\includes\js\dane_js.js" />
+    <Compile Include="rejsm_superwtyczka\includes\js\js_pesel_verification.js" />
+    <Compile Include="rejsm_superwtyczka\includes\js\js_wynik_actualize.js" />
+    <Compile Include="rejsm_superwtyczka\includes\js\rejsm_ankieta.js" />
+    <Compile Include="rejsm_superwtyczka\includes\js\rejsm_datepicker.js" />
+    <Compile Include="rejsm_superwtyczka\includes\add_styles.php" />
+    <Compile Include="rejsm_superwtyczka\includes\class_user_dane.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_all_user_info.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_custom_design.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_eq5d_post_type.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_form_dane_demograficzne.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_listy.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_msis_29_post_type.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_registration_form_customize.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_szpital_taxonomy_for_users.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_users_possibilities.php" />
+    <Compile Include="rejsm_superwtyczka\rejsm_superwtyczka.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\class_rejsm_migrate.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\migrate_listy_column.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\rejsm_external_database.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_add_users.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_add_user_demog.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_delete_users.php" />
+    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_user_login_string.php" />
+    <Compile Include="rejsm_wielkamigracja\rejsm_users_add_metadata.php" />
+    <Compile Include="zbedne pliki\boj-music-collection.php" />
+    <Compile Include="zbedne pliki\book_post_type.php" />
+    <Compile Include="zbedne pliki\movie_rating.php" />
+    <Compile Include="zbedne pliki\rejsm_authenticate_by_pesel.php" />
+    <Compile Include="zbedne pliki\rejsm_change_username_text.php" />
+    <Compile Include="zbedne pliki\rejsm_dane_demograficzne_post_type.php" />
+    <Compile Include="zbedne pliki\rejsm_dane_demograficzne_post_type_taxonomy.php" />
+    <Compile Include="zbedne pliki\rejsm_form_dane_demograficzne2.php" />
+    <Compile Include="zbedne pliki\rejsm_new_post_type_badanie.php" />
+    <Compile Include="zbedne pliki\rejsm_user_taxonomy_szpital.php" />
+    <Compile Include="zbedne pliki\rejsm_validate_pesel.php" />
+    <Compile Include="hello.php" />
+    <Compile Include="index.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".idea\copyright" />
+    <Folder Include=".idea" />
+    <Folder Include="rejsm_superwtyczka\includes\css" />
+    <Folder Include="rejsm_superwtyczka\includes\images" />
+    <Folder Include="rejsm_superwtyczka\includes\js" />
+    <Folder Include="rejsm_superwtyczka\includes" />
+    <Folder Include="rejsm_superwtyczka" />
+    <Folder Include="rejsm_wielkamigracja\includes" />
+    <Folder Include="rejsm_wielkamigracja" />
+    <Folder Include="zbedne pliki" />
+  </ItemGroup>
+</Project>

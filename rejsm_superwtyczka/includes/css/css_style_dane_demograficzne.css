@@ -1,31 +1,30 @@
-#pesel {
+
+
+#Plec {
     width: 15em;
 }
-#plec {
+#MiejsceZamieszkania {
     width: 15em;
 }
-#miejsce_zamieszkania {
+#Wojewodztwo {
     width: 15em;
 }
-#wojewodztwo {
+#Recznosc {
     width: 15em;
 }
-#recznosc {
+#Porody {
     width: 15em;
 }
-#porody {
+#Wyksztalcenie {
     width: 15em;
 }
-#wyksztalcenie {
+#StanRodzinny {
     width: 15em;
 }
-#stan_rodzinny {
+#Zatrudnienie {
     width: 15em;
 }
-#zatrudnienie {
-    width: 15em;
-}
-#praca_dochod {
+#Praca_dochod {
     width: 15em;
 }
 #sm_w_rodzinie {
@@ -62,8 +61,14 @@
     width: 15em;
 }
 
+.drop-down{
+    width: 15em;
+}
 .ankieta {
     text-align: center;
+}
+.MyDate{
+    width: 15em;
 }
 .msis_eq5d_check {
     text-align: right;

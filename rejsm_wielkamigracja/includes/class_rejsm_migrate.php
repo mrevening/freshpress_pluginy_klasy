@@ -6,6 +6,8 @@
  * Date: 2016-09-18
  * Time: 16:48
  */
+require_once dirname(__FILE__) . '/migrate_listy_column.php';
+
 class rejsm_migrate
 {
     private $db;
@@ -47,68 +49,6 @@ class rejsm_migrate
         if ( $wynik >= 51 && $wynik <= 75 ) $kategoria = 'dobre';
         if ( $wynik >= 76 && $wynik <= 100 ) $kategoria = 'bardzo dobre';
         return $kategoria;
-    }
-    public function create_users_from_dane_demograficzne ()
-    {
-        $sql = "SELECT Pesel, Plec, MiejsceZamieszkania, Wojewodztwo, Recznosc, Porody, Wyksztalcenie, StanRodzinny, Zatrudnienie,
-                        SMwRodzinie, Inicjaly, PracaZarobek, Data_zgonu, Deleted FROM danedemograficzne Limit 1";//WHERE PESEL = ".$row_dane->{'PESEL'};
-        $dane = $this->db->get_results($sql, OBJECT);
-        if ($this->db->last_error) {
-            echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
-            return new WP_Error('broke', __("Błąd podczas pobierania metadanych. "));
-        }
-        foreach ($dane as $row) {
-            if ( username_exists($row->{'Pesel'} ) ) {
-                echo $row->{'Pesel'} . " -> Użytkownik już istnieje. " ;
-            }
-            else if( $row->{'Deleted'} == 0) {
-                echo $row->{'Pesel'} . " dane_demogr, ";
-                $userdata = array(
-                    'user_login' => $row->{'Pesel'},
-                    'user_email' => $row->{'Pesel'} . '_zastepczy@mail.com',
-                    'user_pass' => self::randomPassword(),
-                    'role' => 'pacjent',
-                    'nickname' => $row->{'Inicjaly'},
-                );
-                $user_created_new_id = wp_insert_user($userdata);
-                add_user_meta($user_created_new_id, 'miejsce_zamieszkania', $row->{'MiejsceZamieszkania'});
-                add_user_meta($user_created_new_id, 'wojewodztwo', $row->{'Wojewodztwo'});
-                add_user_meta($user_created_new_id, 'recznosc', $row->{'Recznosc'});
-                add_user_meta($user_created_new_id, 'porody', $row->{'Porody'});
-                add_user_meta($user_created_new_id, 'wyksztalcenie', $row->{'Wyksztalcenie'});
-                add_user_meta($user_created_new_id, 'stan_rodzinny', $row->{'StanRodzinny'});
-                add_user_meta($user_created_new_id, 'zatrudnienie', $row->{'Zatrudnienie'});
-                add_user_meta($user_created_new_id, 'praca_dochod', $row->{'PracaZarobek'});
-                add_user_meta($user_created_new_id, 'sm_w_rodzinie', $row->{'SMwRodzinie'});
-                add_user_meta($user_created_new_id, 'data_zgonu', $row->{'Data_zgonu'});
-
-
-                $sql = "SELECT * FROM wywiad WHERE PESEL = ".$row->{'Pesel'};
-                $wywiad = $this->db->get_row($sql, OBJECT);
-//                echo $sql;
-//                if(is_object($wywiad)) echo 'obiekt'; else echo 'nieobiekt';
-//                if(is_array($wywiad)) echo 'array'; else echo 'niearray';
-                if ($this->db->last_error) {
-                    echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
-                    return new WP_Error('broke', __("Błąd podczas pobierania metadanych. "));
-                }
-//                var_dump( $wywiad);
-//                echo $wywiad;
-                add_user_meta($user_created_new_id, 'pierwsze_objawy', $wywiad->{'PierwszeObjawy'});
-                add_user_meta($user_created_new_id, 'pierwsze_objawy_data', $wywiad->{'PierwszeObjawyData'});
-                add_user_meta($user_created_new_id, 'diagnozaSM', $wywiad->{'DiagnozaSM'});
-                add_user_meta($user_created_new_id, 'zapalenie_nerwow_wzrokowych', $wywiad->{'ZapalenieNerwowWzrokowych'});
-                add_user_meta($user_created_new_id, 'nadcisnienie_tetnicze', $wywiad->{'NadcisnienieTetnicze'});
-                add_user_meta($user_created_new_id, 'cukrzyca', $wywiad->{'Cukrzyca'});
-                add_user_meta($user_created_new_id, 'tarczyca', $wywiad->{'Tarczyca'});
-                add_user_meta($user_created_new_id, 'zakrzepowozatorowe', $wywiad->{'ZakrzepowoZatorowe'});
-                add_user_meta($user_created_new_id, 'nowotwory', $wywiad->{'Nowotwory'});
-                add_user_meta($user_created_new_id, 'postacSM', $wywiad->{'PostacSM'});
-                add_user_meta($user_created_new_id, 'kryterium_McDonald', $wywiad->{'KryteriumMcDonald'});
-            }
-            echo "</BR>";
-        }
-        echo "</BR>";
     }
     public function create_users_from_patients() {
 
@@ -275,7 +215,99 @@ class rejsm_migrate
             echo "</BR>";
         }
     }
-    public function create_lekarze_from_users ()
+    private function insert_ankieta($tytul, $user_id, $row, $list){
+
+        $my_post = array();
+        switch ($tytul) {
+            case 'patients_msis':
+                $title = 'Ankieta msis_29_'.$user_id.'_'.$row->{'Data'};
+                $my_post = array(
+                    'post_type' => 'msis_29',
+                    'post_title' => $title,
+                    'post_status' => 'publish',
+                    'post_author' => $user_id,
+                    'post_date' => $row->{'Data'},
+                );
+                break;
+            case 'patients_eq5d':
+                $title = 'Ankieta eq5d_'.$user_id.'_'.$row->{'Data'};
+                $my_post = array(
+                    'post_type' => 'eq5d',
+                    'post_title' => 'eq5d',
+                    'post_status' => 'publish',
+                    'post_author' => $user_id,
+                    'post_date' => $row->{'Data'},
+                );
+                break;
+        }
+        $id = wp_insert_post( $my_post );
+        $j=1;
+        $wynik = 0;
+        switch ($tytul) {
+            case 'patients_msis':
+                foreach ($list as $name ) {
+                    $name2 = '_rejsm_msis_29_'.$j;
+                    $value = $row->{$name}-1;
+                    update_post_meta($id, $name2, $value );
+                    $wynik = $wynik + $value;
+                    $j++;
+                }
+                update_post_meta($id, '_msis_29_wynik', $wynik );
+                wp_set_object_terms( $id, self::add_category_msis_29($wynik), 'kategoria_msis_29',  false ); //add_category_msis_29(intval($wynik))
+                break;
+            case 'patients_eq5d':
+                foreach ($list as $name ) {
+                    $name2 = '_rejsm_eq5d_'.$j;
+                    $value = $row->{$name}-1;
+                    update_post_meta($id, $name2, $value );
+                    $wynik = $wynik + $value;
+                    $j++;
+                }
+                update_post_meta($id, '_eq5d_wynik', $wynik );
+                wp_set_object_terms( $id, self::add_category_eq5d($wynik), 'kategoria_eq5d',  false ); //add_category_eq5d(intval($wynik))
+                break;
+        }
+    }
+    public function create_patients()
+    {
+        $sql = "SELECT PESEL, email, password FROM patients ORDER BY PESEL ASC LIMIT 10";
+        $dane_podstawowe_pacjentow = $this->db->get_results($sql, OBJECT);
+        $user_created_new_id = 0;
+        $user_dane = array();
+        $nazwy_tabeli = array('patients', 'patients_demog', 'patients_eurems');
+        $nazwy_tabeli_taksonomii = array( 'patients_eq5d', 'patients_msis');
+        foreach ($dane_podstawowe_pacjentow as $dane_pacjenta) {
+            $pesel = $dane_pacjenta->PESEL;
+            foreach ($nazwy_tabeli as $tabela) {
+                switch ($tabela) {
+                    case 'patients':
+                        $user_created_new_id = $this->create_user_demogr($dane_pacjenta);
+                        $user_dane = $dane_pacjenta;
+                        break;
+                    case 'patients_demog':
+                        $sql = "SELECT * FROM patients_demog WHERE `PESEL` = " . $pesel;
+                        $user_dane = $this->db->get_row($sql, OBJECT);
+                        break;
+                    case 'patients_eurems':
+                        $sql = "SELECT * FROM patients_eurems WHERE PESEL = " . $pesel;
+                        $user_dane = $this->db->get_row($sql, OBJECT);
+                        break;
+                }
+            }
+            $lista = $this->get_lista($tabela);
+            $this->add_user_metas($user_created_new_id, $lista, $user_dane);
+            foreach ($nazwy_tabeli_taksonomii as $tabela) {
+                    $lista = $this->get_lista($tabela);
+                    $sql = "SELECT * FROM ".$tabela." WHERE PESEL = " . $pesel;
+                    $user_dane = $this->db->get_row($sql, OBJECT);
+                    //echo ('<pre>');
+                    //var_dump ($user_dane);
+                    //echo ('</pre>');
+                    $this->insert_ankieta($tabela, $user_created_new_id, $user_dane, $lista);
+            }
+        }
+    }
+    public function create_lekarze ()
     {
         $sql = "SELECT UserName, UserPassword, UserImie, UserNazwisko, SzpitalMiasto, Admin FROM users ";
         $dane = $this->db->get_results($sql, OBJECT);
@@ -308,6 +340,208 @@ class rejsm_migrate
             echo "</BR>";
         }
     }
+    public function create_users_from_dane_demograficzne ()
+    {
+        $sql = "SELECT Pesel, Plec, MiejsceZamieszkania, Wojewodztwo, Recznosc, Porody, Wyksztalcenie, StanRodzinny, Zatrudnienie,
+                        SMwRodzinie, Inicjaly, PracaZarobek, Data_zgonu, Deleted FROM danedemograficzne Limit 1";//WHERE PESEL = ".$row_dane->{'PESEL'};
+        $dane = $this->db->get_results($sql, OBJECT);
+        if ($this->db->last_error) {
+            echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
+            return new WP_Error('broke', __("Błąd podczas pobierania metadanych. "));
+        }
+        foreach ($dane as $row) {
+            if ( username_exists($row->{'Pesel'} ) ) {
+                echo $row->{'Pesel'} . " -> Użytkownik już istnieje. " ;
+            }
+            else if( $row->{'Deleted'} == 0) {
+                echo $row->{'Pesel'} . " dane_demogr, ";
+                $userdata = array(
+                    'user_login' => $row->{'Pesel'},
+                    'user_email' => $row->{'Pesel'} . '_zastepczy@mail.com',
+                    'user_pass' => self::randomPassword(),
+                    'role' => 'pacjent',
+                    'nickname' => $row->{'Inicjaly'},
+                );
+                $user_created_new_id = wp_insert_user($userdata);
+                add_user_meta($user_created_new_id, 'miejsce_zamieszkania', $row->{'MiejsceZamieszkania'});
+                add_user_meta($user_created_new_id, 'wojewodztwo', $row->{'Wojewodztwo'});
+                add_user_meta($user_created_new_id, 'recznosc', $row->{'Recznosc'});
+                add_user_meta($user_created_new_id, 'porody', $row->{'Porody'});
+                add_user_meta($user_created_new_id, 'wyksztalcenie', $row->{'Wyksztalcenie'});
+                add_user_meta($user_created_new_id, 'stan_rodzinny', $row->{'StanRodzinny'});
+                add_user_meta($user_created_new_id, 'zatrudnienie', $row->{'Zatrudnienie'});
+                add_user_meta($user_created_new_id, 'praca_dochod', $row->{'PracaZarobek'});
+                add_user_meta($user_created_new_id, 'sm_w_rodzinie', $row->{'SMwRodzinie'});
+                add_user_meta($user_created_new_id, 'data_zgonu', $row->{'Data_zgonu'});
 
 
+                $sql = "SELECT * FROM wywiad WHERE PESEL = ".$row->{'Pesel'};
+                $wywiad = $this->db->get_row($sql, OBJECT);
+//                echo $sql;
+//                if(is_object($wywiad)) echo 'obiekt'; else echo 'nieobiekt';
+//                if(is_array($wywiad)) echo 'array'; else echo 'niearray';
+                if ($this->db->last_error) {
+                    echo "Błąd podczas pobierania metadanych z dane_demograficzne. ";
+                    return new WP_Error('broke', __("Błąd podczas pobierania metadanych. "));
+                }
+//                var_dump( $wywiad);
+//                echo $wywiad;
+                add_user_meta($user_created_new_id, 'pierwsze_objawy', $wywiad->{'PierwszeObjawy'});
+                add_user_meta($user_created_new_id, 'pierwsze_objawy_data', $wywiad->{'PierwszeObjawyData'});
+                add_user_meta($user_created_new_id, 'diagnozaSM', $wywiad->{'DiagnozaSM'});
+                add_user_meta($user_created_new_id, 'zapalenie_nerwow_wzrokowych', $wywiad->{'ZapalenieNerwowWzrokowych'});
+                add_user_meta($user_created_new_id, 'nadcisnienie_tetnicze', $wywiad->{'NadcisnienieTetnicze'});
+                add_user_meta($user_created_new_id, 'cukrzyca', $wywiad->{'Cukrzyca'});
+                add_user_meta($user_created_new_id, 'tarczyca', $wywiad->{'Tarczyca'});
+                add_user_meta($user_created_new_id, 'zakrzepowozatorowe', $wywiad->{'ZakrzepowoZatorowe'});
+                add_user_meta($user_created_new_id, 'nowotwory', $wywiad->{'Nowotwory'});
+                add_user_meta($user_created_new_id, 'postacSM', $wywiad->{'PostacSM'});
+                add_user_meta($user_created_new_id, 'kryterium_McDonald', $wywiad->{'KryteriumMcDonald'});
+            }
+            echo "</BR>";
+        }
+        echo "</BR>";
+    }
+    private function get_lista($tabela){
+        $lista = array();
+        switch ($tabela){
+            case 'patients_demogr':
+                $lista = array(
+                    'PESEL',
+                    'MiejsceZamieszkania',
+                    'Wojewodztwo',
+                    'StanRodzinny',
+                    'Wyksztalcenie',
+                    'Porody',
+                    'SMwRodzinie');
+                break;
+            case 'patients_eurems':
+                $lista = array(
+                    'PostacSM',
+                    'PierwszeObjawyData',
+                    'DiagnozaSM',
+                    'Mri',
+                    'BadaniePlynu',
+                    'Immunomodulujace',
+                    'Objawowe',
+                    'Praca');
+                break;
+            case 'patients_msis':
+                $lista = array (
+                    'physical_activity',
+                    'grabbing',
+                    'carrying',
+                    'balance',
+                    'room_movement',
+                    'clumsiness',
+                    'stiffness',
+                    'leg_arms_heavy',
+                    'leg_arms_shakes',
+                    'leg_arms_contraption',
+                    'no_body_control',
+                    'activity_dependancy',
+                    'visitation_limitation',
+                    'prolonged_home_stay',
+                    'hands_usage_problem',
+                    'activity_time_limitation',
+                    'transport_usage_problem',
+                    'longer_activity_completion',
+                    'spontaneous_activity_problem',
+                    'urgent_bathroom_visit',
+                    'bad_mood',
+                    'sleep_problem',
+                    'mental_fatigue',
+                    'fear_of_SM',
+                    'stress_anxiety',
+                    'irritation_impatience_impulsiveness',
+                    'concentration_problems',
+                    'lack_of_confidence',
+                    'depression',
+                );
+                break;
+            case 'patients_eq5d':
+                $lista = array (
+                    'movement',
+                    'self_care',
+                    'normal_activity',
+                    'pain_discomfort',
+                    'anxiety_depression',
+                    'health_total',
+                );
+                break;
+            case 'danedemograficzne':
+                $lista = array(
+                    'MiejsceZamieszkania',
+                    'Wojewodztwo',
+                    'Recznosc',
+                    'Porody',
+                    'Wyksztalcenie',
+                    'StanRodzinny',
+                    'Zatrudnienie',
+                    'SMwRodzinie',
+                    'PracaZarobek',
+                    'Data_zgonu');
+                break;
+            case 'wywiad':
+                $lista =array(
+                    'PierwszeObjawy',
+                    'PierwszeObjawyData',
+                    'DiagnozaSM',
+                    'ZapalenieNerwowWzrokowych',
+                    'NadcisnienieTetnicze',
+                    'Cukrzyca',
+                    'Tarczyca',
+                    'ZakrzepowoZatorowe',
+                    'Nowotwory',
+                    'PostacSM',
+                    'KryteriumMcDonald',
+                );
+                break;
+        }
+        return $lista;
+    }
+    private function add_user_metas($user_id, $lista, $row ){
+        foreach ($lista as $kolumna) {
+            add_user_meta($user_id, $kolumna, $row->{$kolumna});
+        }
+    }
+    private function create_user_demogr($user_dane){
+        if (username_exists($user_dane->PESEL)) echo $user_dane->{'Pesel'} . " -> Użytkownik już istnieje. ";
+//        else if ($user_dane->deleted == 0) {
+//            echo $user_dane->{'Pesel'} . " podstawowe dane ok,  ";
+            $userdata = array(
+                'user_login' => $user_dane->PESEL,
+                'user_email' => $user_dane->PESEL . '_zastepczy@mail.com',
+                'user_pass' => self::randomPassword(),
+                'role' => 'pacjent',
+//                'nickname' => $user_dane->Inicjaly,
+            );
+            return wp_insert_user($userdata);
+        }
+//    }
+    public function create_users (){
+        $sql = "SELECT * FROM danedemograficzne Limit 30";
+        $danedemograficzne_wszystkich_pacjentow = $this->db->get_results($sql, OBJECT);
+        $user_created_new_id = 0;
+        $user_dane = array();
+        $nazwy_tabeli = array('danedemograficzne', 'wywiad');
+        foreach ($danedemograficzne_wszystkich_pacjentow as $dane_pacjenta) {
+            print_r($dane_pacjenta);
+            $pesel = $dane_pacjenta->{'Pesel'};
+            foreach ($nazwy_tabeli as $tabela) {
+                switch ($tabela) {
+                    case 'danedemograficzne':
+                        $user_created_new_id = $this->create_user_demogr($dane_pacjenta);
+                        $user_dane = $dane_pacjenta;
+                        break;
+                    case 'wywiad':
+                        $sql = "SELECT * FROM wywiad WHERE PESEL = ".$pesel;
+                        $user_dane = $this->db->get_row($sql, OBJECT);
+                        break;
+                }
+                $lista = $this->get_lista($tabela);
+                $this->add_user_metas($user_created_new_id, $lista, $user_dane);
+            }
+        }
+    }
 }
