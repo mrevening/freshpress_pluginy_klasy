@@ -120,7 +120,7 @@ function remove_admin_stuff( $translated_text, $untranslated_text, $domain ) {
 }
 
 function remove_posts_menu() {
-    
+
     if ( ! function_exists( 'unregister_post_type' ) ) :
     function unregister_post_type( $post_type ) {
         global $wp_post_types;
@@ -168,4 +168,64 @@ add_action( 'admin_menu', 'hide_the_dashboard' );
 //}
 //add_filter( 'login_redirect', 'your_login_redirect', 10, 3 );
 
+
+
+//function new_contact_methods( $contactmethods ) {
+//    $contactmethods['phone'] = 'Phone Number';
+//    return $contactmethods;
+//}
+//add_filter( 'user_contactmethods', 'new_contact_methods', 10, 1 );
+
+
+function new_modify_user_table( $column ) {
+    $column['msis_29'] = 'MSIS-29';
+    $column['eq5d'] = 'EQ-5D';
+    return $column;
+}
+add_filter( 'manage_users_columns', 'new_modify_user_table' );
+
+function new_modify_user_table_row( $val, $column_name, $user_id ) {
+    switch ($column_name) {
+        case 'eq5d' :
+        case 'msis_29' :
+            return my_manage_users_columns ($column_name, $user_id);
+            break;
+        default:
+    }
+    return $val;
+}
+add_filter( 'manage_users_custom_column', 'new_modify_user_table_row', 10, 3 );
+
+
+function custom_count_posts_by_author($user_id, $post_type = array('post', 'page'))
+{
+    $args = array(
+        'post_type' => $post_type,
+        'author'    => $user_id,
+        'post_staus'=> 'publish',
+        'posts_per_page' => -1
+    );
+
+    $query = new WP_Query($args);
+
+    return $query->found_posts;
+}
+
+//add_action( 'manage_users_custom_column', 'my_manage_users_columns', 10, 2 );
+function my_manage_users_columns( $column, $author_id ) {
+    global $post;
+
+    $ilosc_badan = custom_count_posts_by_author( $author_id, $column);
+    $out = '';
+    switch( $column ) {
+
+        /* If displaying the 'duration' column. */
+        case 'eq5d' :
+        case 'msis_29' :
+            $out = sprintf('<a href="%s">%s</a>',
+                    esc_url( add_query_arg( array( 'post_type' => $column, 'author' => $author_id ), 'edit.php' ) ), $ilosc_badan);
+            break;
+    }
+    return $out;
+}
 ?>

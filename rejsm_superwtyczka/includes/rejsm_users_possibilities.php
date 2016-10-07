@@ -52,8 +52,8 @@ if ( !empty ($role) ){
     $role->add_cap('edit_others_msis_29');
     $role->add_cap('publish_msis_29');
     $role->add_cap('delete_msis_29');
-    $role->add_cap( 'edit_msis_29' );
-    $role->add_cap( 'delete_msis_29' );
+    $role->add_cap('edit_msis_29' );
+    $role->add_cap('delete_msis_29' );
 //
     $role->add_cap('read_eq5d');
     $role->add_cap('edit_eq5d');
@@ -121,7 +121,7 @@ function disable_new_post() {
     if ( get_current_screen()->post_type == 'eq5d' )
         wp_die( "Ankiety EQ-5D są przeznaczone do indywidualnego wypełniania przez pacjentów." );
     if ( get_current_screen()->post_type == 'msis_29' )
-        wp_die( "Ankiety MSIS-29 one przeznaczone do indywidualnego wypełniania przez pacjentów." );
+        wp_die( "Ankiety MSIS-29 są przeznaczone do indywidualnego wypełniania przez pacjentów." );
 }
 
 $role = get_role( 'administrator' );
