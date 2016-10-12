@@ -185,40 +185,17 @@ function my_edit_user_profession_section( $user ) {
 
 			<td><?php
 
-
-
-            //////////////////usun
-			/* If there are any profession terms, loop through them and display checkboxes. */
-			if ( !empty( $terms ) ) {
-                
-				foreach ( $terms as $term ) { ?>
-					<input 
-                        type="radio" 
-                        name="profession" 
-                        id="profession-<?php echo esc_attr( $term->slug ); ?>" 
-                        value="<?php echo esc_attr( $term->slug ); ?>" 
-                        <?php checked( true, is_object_in_term( $user->ID, 'szpital', $term ) ); ?> /> 
-                        <label for="profession-<?php echo esc_attr( $term->slug ); ?>">
-                        <?php echo $term->name; ?>
-                        </label> 
-                        <br />
-				<?php }
-			}
-            //////////////////////dot¹d mo¿esz usun¹æ.
-
-
             if ( !empty( $terms ) ) {
-                ?> <select id="szpital" name="szpital"> <?php
+                ?> <select id="szpital" name="szpital" > <?php
+                ?> <option disabled selected value></option> <?php
                 foreach ( $terms as $term ) { ?>
-                     <option value="<?php echo esc_attr( $term->slug ); ?>" <?php selected( true, is_object_in_term( $user->ID, 'szpital', $term ) ); ?> /> <?php echo $term->name; ?> </option></select>
-                <?php }
+                     <option value="<?php echo esc_attr( $term->slug ); ?>" <?php selected( true, is_object_in_term( $user->ID, 'szpital', $term ) ); ?> /> <?php echo $term->name; ?> </option>
+                <?php } ?> </select> <?php
 			}
-
 			/* If there are no profession terms, display a message. */
 			else {
 				_e( 'There are no hospitals available.' );
 			}
-
 			?></td>
 		</tr>
 
@@ -238,23 +215,41 @@ add_action( 'edit_user_profile_update', 'my_save_user_profession_terms' );
  */
 function my_save_user_profession_terms( $user_id ) {
 
-    $tax = get_taxonomy( 'profession' );
+    $tax = get_taxonomy( 'szpital' );
 
     /* Make sure the current user can edit the user and assign terms before proceeding. */
     if ( !current_user_can( 'edit_user', $user_id ) && current_user_can( $tax->cap->assign_terms ) )
         return false;
 
-    $term = esc_attr( $_POST['profession'] );
+    $term = esc_attr( $_POST['szpital'] );
 
     /* Sets the terms (we're just using a single term) for the user. */
-    wp_set_object_terms( $user_id, array( $term ), 'profession', false);
+    wp_set_object_terms( $user_id, array( $term ), 'szpital', false);
 
-    clean_object_term_cache( $user_id, 'profession' );
+    clean_object_term_cache( $user_id, 'szpital' );
 }
 
 
-
-
+function cods() { 
+    //////////////////usun
+    /* If there are any profession terms, loop through them and display checkboxes. */
+    if ( !empty( $terms ) ) {
+        
+        foreach ( $terms as $term ) { ?>
+					<input 
+                        type="radio" 
+                        name="profession" 
+                        id="profession-<?php echo esc_attr( $term->slug ); ?>" 
+                        value="<?php echo esc_attr( $term->slug ); ?>" 
+                        <?php checked( true, is_object_in_term( $user->ID, 'szpital', $term ) ); ?> /> 
+                        <label for="profession-<?php echo esc_attr( $term->slug ); ?>">
+                        <?php echo $term->name; ?>
+                        </label> 
+                        <br />
+				<?php }
+    }
+}
+//////////////////////dot¹d mo¿esz usun¹æ.
 
 
 //wp_tag_cloud( array( 'taxonomy' => 'profession' ) ); 

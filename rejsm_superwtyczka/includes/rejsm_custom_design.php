@@ -178,6 +178,7 @@ add_action( 'admin_menu', 'hide_the_dashboard' );
 
 
 function new_modify_user_table( $column ) {
+    $column['szpital'] = 'szpital';
     $column['msis_29'] = 'MSIS-29';
     $column['eq5d'] = 'EQ-5D';
     return $column;
@@ -187,6 +188,7 @@ add_filter( 'manage_users_columns', 'new_modify_user_table' );
 function new_modify_user_table_row( $val, $column_name, $user_id ) {
     switch ($column_name) {
         case 'eq5d' :
+        case 'szpital' :
         case 'msis_29' :
             return my_manage_users_columns ($column_name, $user_id);
             break;
@@ -222,10 +224,42 @@ function my_manage_users_columns( $column, $author_id ) {
         /* If displaying the 'duration' column. */
         case 'eq5d' :
         case 'msis_29' :
-            $out = sprintf('<a href="%s">%s</a>',
-                    esc_url( add_query_arg( array( 'post_type' => $column, 'author' => $author_id ), 'edit.php' ) ), $ilosc_badan);
+            if ($ilosc_badan == 0){
+                $out = '';
+            }
+            else {
+                $out = sprintf('<a href="%s">%s</a>',
+                        esc_url( add_query_arg( array( 'post_type' => $column, 'author' => $author_id ), 'edit.php' ) ), $ilosc_badan);
+
+            }
+            break;
+        case 'szpital':
+            $i = '(+)';
+            $term_list = wp_get_object_terms($author_id, 'szpital', array("fields" => "names"));
+            foreach($term_list as $term_single) {
+                if ( term_exists ($term_single) ) $i = $term_single;
+            }
+            //var_dump ($term_list);
+            $out = sprintf('<a href="%s#szpital">%s</a>',
+                        esc_url( add_query_arg( array( 'user_id' => $author_id ), 'user-edit.php' ) ), $i);
+                        //esc_url( add_query_arg( array( 'taxonomy' => $column ), 'edit-tags.php' ) ), $i);
             break;
     }
+
+
     return $out;
 }
+
+add_action('manage_users_columns','remove_user_posts_column');
+function remove_user_posts_column($column_headers) {
+    unset($column_headers['posts']);
+    unset($column_headers['name']);
+    return $column_headers;
+}
+
+
+
+
+
+
 ?>

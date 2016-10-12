@@ -9,10 +9,10 @@ require_once dirname(__FILE__) . '/class_rejsm_migrate.php.';
 
 
 $Custom_DB = new rejsm_migrate;
+$Custom_DB->create_lekarze();
 $Custom_DB->create_patients();
-//$Custom_DB->create_users_from_dane_demograficzne();
-//$Custom_DB->create_lekarze();
-//$Custom_DB->create_users();
+$Custom_DB->create_users();
+//$Custom_DB->create_users_from_dane_demograficzne(); // old version of create_users, I think
 if ( is_wp_error( $Custom_DB )) {
     echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
 }

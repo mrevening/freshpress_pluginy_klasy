@@ -95,8 +95,10 @@ class class_user_dane {
                                 $i = 1;
                                 foreach ($this->wybory as $wybor) {
                                     if ($plec == $i) { ?>
-                                    <option value="<?php echo $i; ?>"><?php echo $wybor; $i++; ?></option>
-                            <?php } }?>
+                                    <option value="<?php echo $i; ?>"><?php echo $wybor;  ?></option>
+                            <?php   } 
+                                $i++; 
+                                }?>
                         </select>
                     </td>
                 </tr>

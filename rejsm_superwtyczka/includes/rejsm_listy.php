@@ -21,9 +21,7 @@ function get_lista_tytulow_i_typow_demograficzne(){
 function get_lista_wyborow_demograficzne(){
     return array(
         'MiejsceZamieszkania' => array('Miasto', 'Wieś',),
-        'Wojewodztwo' => array(
-            'dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie', 'łódzkie', 'małopolskie', 'mazowieckie', 'opolskie', 'podkarpackie', 'podlaskie', 'pomorskie', 'śląskie', 'świętokrzyskie', 'warmińsko-mazurskie', 'wielkopolskie', 'zachodniopomorskie',
-        ),
+        'Wojewodztwo' => array('dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie', 'łódzkie', 'małopolskie', 'mazowieckie', 'opolskie', 'podkarpackie', 'podlaskie', 'pomorskie', 'śląskie', 'świętokrzyskie', 'warmińsko-mazurskie', 'wielkopolskie', 'zachodniopomorskie'),
         'Recznosc'=>array('Praworęczny', 'Leworęczny',),
         'Porody'=>array('0', '1', '2', '3 lub więcej',),
         'Wyksztalcenie'=>array('Podstawowe', 'Średnie', 'Wyższe'),

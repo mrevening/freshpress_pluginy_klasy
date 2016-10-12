@@ -37,7 +37,7 @@ function rejsm_display_metadata( $user ){
             ?></table><?php
             class_user_dane::reset_lista_objektow();
         }
-    }
+    }    
 }
 
 

@@ -45,6 +45,12 @@ add_role( 'lekarz',
 /*Pobranie roli administratora*/
 $role = get_role( 'administrator' );
 if ( !empty ($role) ){
+
+    $role->add_cap('manage_szpital');
+    $role->add_cap('assign_szpital');
+    $role->add_cap('edit_szpital');
+    $role->add_cap('delete_szpital');
+
     $role->add_cap('read_msis_29');
     $role->add_cap('read_private_msis_29');
     $role->add_cap('edit_msis_29');

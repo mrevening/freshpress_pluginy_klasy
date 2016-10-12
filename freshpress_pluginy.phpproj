@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,7 +35,7 @@
     <Compile Include="rejsm_superwtyczka\includes\rejsm_all_user_info.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_custom_design.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_eq5d_post_type.php" />
-    <Compile Include="rejsm_superwtyczka\includes\rejsm_form_dane_demograficzne.php" />
+    <Compile Include="zbedne pliki\rejsm_form_dane_demograficzne.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_listy.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_msis_29_post_type.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_registration_form_customize.php" />
@@ -42,12 +43,12 @@
     <Compile Include="rejsm_superwtyczka\includes\rejsm_users_possibilities.php" />
     <Compile Include="rejsm_superwtyczka\rejsm_superwtyczka.php" />
     <Compile Include="rejsm_wielkamigracja\includes\class_rejsm_migrate.php" />
-    <Compile Include="rejsm_wielkamigracja\includes\migrate_listy_column.php" />
+    <Compile Include="zbedne pliki\migrate_listy_column.php" />
     <Compile Include="rejsm_wielkamigracja\includes\rejsm_external_database.php" />
-    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_add_users.php" />
-    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_add_user_demog.php" />
+    <Compile Include="zbedne pliki\rejsm_script_add_users.php" />
+    <Compile Include="zbedne pliki\rejsm_script_add_user_demog.php" />
     <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_delete_users.php" />
-    <Compile Include="rejsm_wielkamigracja\includes\rejsm_script_user_login_string.php" />
+    <Compile Include="zbedne pliki\rejsm_script_user_login_string.php" />
     <Compile Include="rejsm_wielkamigracja\rejsm_users_add_metadata.php" />
     <Compile Include="zbedne pliki\boj-music-collection.php" />
     <Compile Include="zbedne pliki\book_post_type.php" />
