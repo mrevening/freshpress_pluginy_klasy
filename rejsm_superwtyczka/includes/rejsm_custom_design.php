@@ -178,7 +178,10 @@ add_action( 'admin_menu', 'hide_the_dashboard' );
 
 
 function new_modify_user_table( $column ) {
-    $column['szpital'] = 'szpital';
+    $column['szpital'] = 'Szpital';
+    $column['danedemograficzne'] = 'Dane demograficzne';
+    $column['wywiad'] = 'Wywiad';
+    $column['diagnostyka'] = 'Diagnostyka';
     $column['msis_29'] = 'MSIS-29';
     $column['eq5d'] = 'EQ-5D';
     return $column;
@@ -189,10 +192,14 @@ function new_modify_user_table_row( $val, $column_name, $user_id ) {
     switch ($column_name) {
         case 'eq5d' :
         case 'szpital' :
+        case 'wywiad' :
+        case 'danedemograficzne' :
+        case 'diagnostyka' :
+        case 'szpital' :
         case 'msis_29' :
             return my_manage_users_columns ($column_name, $user_id);
-            break;
         default:
+            break;
     }
     return $val;
 }
@@ -216,14 +223,12 @@ function custom_count_posts_by_author($user_id, $post_type = array('post', 'page
 //add_action( 'manage_users_custom_column', 'my_manage_users_columns', 10, 2 );
 function my_manage_users_columns( $column, $author_id ) {
     global $post;
-
-    $ilosc_badan = custom_count_posts_by_author( $author_id, $column);
     $out = '';
     switch( $column ) {
-
         /* If displaying the 'duration' column. */
         case 'eq5d' :
         case 'msis_29' :
+            $ilosc_badan = custom_count_posts_by_author( $author_id, $column);
             if ($ilosc_badan == 0){
                 $out = '';
             }
@@ -234,7 +239,7 @@ function my_manage_users_columns( $column, $author_id ) {
             }
             break;
         case 'szpital':
-            $i = '(+)';
+            $i = 'dodaj';
             $term_list = wp_get_object_terms($author_id, 'szpital', array("fields" => "names"));
             foreach($term_list as $term_single) {
                 if ( term_exists ($term_single) ) $i = $term_single;
@@ -243,6 +248,12 @@ function my_manage_users_columns( $column, $author_id ) {
             $out = sprintf('<a href="%s#szpital">%s</a>',
                         esc_url( add_query_arg( array( 'user_id' => $author_id ), 'user-edit.php' ) ), $i);
                         //esc_url( add_query_arg( array( 'taxonomy' => $column ), 'edit-tags.php' ) ), $i);
+            break;
+        case 'diagnostyka' :
+        case 'wywiad' :
+        case 'danedemograficzne' :
+            $out = sprintf('<a href="%s#'.$column.'">%s</a>',
+                        esc_url( add_query_arg( array( 'user_id' => $author_id ), 'user-edit.php' ) ), 'zobacz');
             break;
     }
 
@@ -256,6 +267,8 @@ function remove_user_posts_column($column_headers) {
     unset($column_headers['name']);
     return $column_headers;
 }
+
+
 
 
 

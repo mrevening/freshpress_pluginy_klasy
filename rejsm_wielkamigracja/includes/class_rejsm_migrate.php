@@ -6,14 +6,15 @@
  * Date: 2016-09-18
  * Time: 16:48
  */
-//require_once dirname(__FILE__) . '/migrate_listy_column.php';
+
+//require_once WP_PLUGIN_DIR . '/rejsm_superwtyczka/includes/rejsm_listy.php';
 
 class rejsm_migrate
 {
     private $db;
-    private $limit_users = ' ORDER BY PESEL ASC LIMIT 30';//' '; //WHERE PESEL LIKE 57112417752
-    private $limit_patients = ' ORDER BY PESEL ASC LIMIT 30';//LIMIT 50
-    private $limit_lekarze = 'LIMIT 10';// LIMIT 20';
+    private $limit_users = ' ORDER BY PESEL ASC LIMIT 20';//' '; //WHERE PESEL LIKE 57112417752
+    private $limit_patients = ' ORDER BY PESEL ASC LIMIT 1';//LIMIT 50
+    private $limit_lekarze = 'LIMIT 1';// LIMIT 20';
     public function __construct() {
         // Connect To Database
         try {
@@ -416,7 +417,7 @@ class rejsm_migrate
                     'Data_zgonu');
                 break;
             case 'wywiad':
-                $lista =array(
+                $lista = array(
                     'PierwszeObjawy',
                     'PierwszeObjawyData',
                     'DiagnozaSM',
@@ -430,27 +431,70 @@ class rejsm_migrate
                     'KryteriumMcDonald',
                 );
                 break;
+            case 'mri':
+                $lista = array(
+                    'Data',
+                );
+                break;
+            case 'potencjaly':
+                $lista = array(
+                    'Potencjaly',
+                    'DodatniUjemny'
+                    );
+                break;
+            case 'plynmozgowy':
+                $lista = array(
+                    'BadaniePlynu',
+                    'Prazki',
+                    );
+                break;
+
         }
         return $lista;
     }
-    private function add_user_metas($user_id, $lista, $row ){
+    private function add_user_metas($user_id, $lista, $row, $tryb='single' ){
         if ($row == NULL) return;
         foreach ($lista as $kolumna) {
-            //echo '<pre>';
-            //echo $kolumna. ' -> ';
-            //var_dump($row->{$kolumna});
-            //echo '</pre>';
-            //if ( $row->{$kolumna} != 0 )
-            add_user_meta($user_id, $kolumna, $row->{$kolumna});
+        switch ($tryb) {
+            case 'single':
+                {
+                    add_user_meta($user_id, $kolumna, $row->$kolumna);
+                }
+                break;
+            case 'multiple':
+                foreach ($row as $single_row){
+                    $prev_value = get_user_meta ($user_id, $kolumna, 'true');
+                    //var_dump ($prev_value);
+                    if( $prev_value ) {
+                        $new_value = $prev_value . ', ' . $single_row->$kolumna;
+                        //echo $new_value;
+                        update_user_meta($user_id, $kolumna, $new_value);
+                    }
+                    else {
+                        $new_value = $single_row->$kolumna;
+                        //echo $new_value;
+                        add_user_meta($user_id, $kolumna, $new_value);
+                        //echo ( get_user_meta ($user_id, $kolumna, 'true'));
+                    }
+
+                    //echo "jestem";
+                    //var_dump ($prev_value);
+                    //var_dump ($new_value);
+                }
+            break;
+            }
         }
     }
-    private function create_user_demogr($user_dane, $pesel){
-        if (username_exists($user_dane->$pesel)) echo $user_dane->$pesel . " -> Użytkownik już istnieje. ";
+
+
+
+    private function create_new_user($user_dane, $pesel_nazwa){
+        if (username_exists($user_dane->$pesel_nazwa)) echo $user_dane->$pesel_nazwa . " -> Użytkownik już istnieje. ";
 //        else if ($user_dane->deleted == 0) {
 //            echo $user_dane->{'Pesel'} . " podstawowe dane ok,  ";
             $userdata = array(
-                'user_login' => $user_dane->$pesel,
-                'user_email' => $user_dane->$pesel . '_zastepczy@mail.com',
+                'user_login' => $user_dane->$pesel_nazwa,
+                'user_email' => $user_dane->$pesel_nazwa . '_zastepczy@mail.com',
                 'user_pass' => self::randomPassword(),
                 'role' => 'pacjent',
 //                'nickname' => $user_dane->Inicjaly,
@@ -466,26 +510,37 @@ class rejsm_migrate
         $danedemograficzne_wszystkich_pacjentow = $this->db->get_results($sql, OBJECT);
         $user_created_new_id = 0;
         $user_dane = array();
-        $nazwy_tabeli = array('danedemograficzne', 'wywiad');
+        $nazwy_tabeli = array('danedemograficzne','wywiad', 'mri', 'potencjaly');
         foreach ($danedemograficzne_wszystkich_pacjentow as $dane_pacjenta) {
             //print_r($dane_pacjenta);
             $pesel = '';
+
             if ( isset( $dane_pacjenta->Pesel )) $pesel = $dane_pacjenta->Pesel;
             else {echo '</BR>nie ma pesla'; return;}
 
             foreach ($nazwy_tabeli as $tabela) {
+                $tryb = 'single';
                 switch ($tabela) {
                     case 'danedemograficzne':
-                        $user_created_new_id = $this->create_user_demogr($dane_pacjenta, 'Pesel');
+                        $user_created_new_id = $this->create_new_user($dane_pacjenta, 'Pesel');
                         $user_dane = $dane_pacjenta;
                         break;
-                    case 'wywiad':
-                        $sql = "SELECT * FROM wywiad WHERE PESEL = ".$pesel;
+                    case 'mri':
+                        $tryb = 'multiple';
+                        $sql = "SELECT * FROM ".$tabela." WHERE PESEL = ".$pesel;
+                        $user_dane = $this->db->get_results($sql, OBJECT);
+                        break;
+                    //case 'potencjaly':
+                    //case 'plynmozgowy'
+                    //case 'wywiad':
+                    default:
+                        $sql = "SELECT * FROM ".$tabela." WHERE PESEL = ".$pesel;
                         $user_dane = $this->db->get_row($sql, OBJECT);
                         break;
                 }
+                //var_dump ($user_dane);
                 $lista = $this->get_lista($tabela);
-                $this->add_user_metas($user_created_new_id, $lista, $user_dane);
+                $this->add_user_metas($user_created_new_id, $lista, $user_dane, $tryb);
             }
         }
     }
@@ -503,7 +558,7 @@ class rejsm_migrate
             foreach ($nazwy_tabeli as $tabela) {
                 switch ($tabela) {
                     case 'patients':
-                        $user_created_new_id = $this->create_user_demogr($dane_pacjenta, 'PESEL');
+                        $user_created_new_id = $this->create_new_user($dane_pacjenta, 'PESEL');
                         $user_dane = $dane_pacjenta;
                         break;
                     case 'patients_eurems':
@@ -512,11 +567,11 @@ class rejsm_migrate
                         $user_dane = $this->db->get_row($sql, OBJECT);
                         break;
                 }
-                $lista = $this->get_lista($tabela);
+                $lista = $this->get_lista($tabela,'lista');
                 $this->add_user_metas($user_created_new_id, $lista, $user_dane);
             }
             foreach ($nazwy_tabeli_taksonomii as $tabela) {
-                $lista = $this->get_lista($tabela);
+                $lista = $this->get_lista($tabela, 'lista');
                 $sql = "SELECT * FROM ".$tabela." WHERE PESEL = " . $pesel;
                 $user_dane = $this->db->get_row($sql, OBJECT);
                 //echo ('<pre>');

@@ -29,12 +29,12 @@ class class_user_dane {
         </tr>
         <?php
     }
-    private function print_calendar () { ?>
+    private function print_calendar ($dane) { ?>
         <tr>
             <th scope="row"><?php echo $this->Nazwa ?></th>
             <td>
                 <input id="<?php echo $this->nazwa_id ?>" type="text" class="MyDate" name="key_<?php echo $this->nazwa_id ?>"
-                       value="<?php echo $this->metadata; ?>"/>
+                       value="<?php echo $dane; ?>"/>
             </td>
         </tr>
         <?php
@@ -77,11 +77,11 @@ class class_user_dane {
 
         switch ($this->typ){
             case 'calendar':
-                $this->print_calendar();
+                $this->print_calendar($this->metadata);
                 break;
             case 'calendar-zgon':
                 if (!current_user_can('pacjent')) {
-                    $this->print_calendar();
+                    $this->print_calendar($this->metadata);
                 }
                 break;
             case 'drop-down-plec':
@@ -114,9 +114,11 @@ class class_user_dane {
             case 'drop-down':
                 $this->print_dropdown_list();
                 break;
+            case 'calendar-mri':
+                $daty = explode(', ', $this->metadata);
+                foreach ($daty as $data) $this->print_calendar($data);
+                break;
         }
-
-
     }
     public static function reset_lista_objektow(){
         self::$lista_objektow = array();
