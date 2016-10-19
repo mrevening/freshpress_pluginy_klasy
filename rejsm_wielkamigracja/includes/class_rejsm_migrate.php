@@ -13,7 +13,7 @@ class rejsm_migrate
 {
     private $db;
     private $limit_users = ' ORDER BY PESEL ASC LIMIT 20';//' '; //WHERE PESEL LIKE 57112417752
-    private $limit_patients = ' ORDER BY PESEL ASC LIMIT 1';//LIMIT 50
+    private $limit_patients = ' ORDER BY PESEL ASC LIMIT 10';//LIMIT 50
     private $limit_lekarze = 'LIMIT 1';// LIMIT 20';
     public function __construct() {
         // Connect To Database
@@ -512,8 +512,16 @@ class rejsm_migrate
         $user_dane = array();
         $nazwy_tabeli = array('danedemograficzne','wywiad', 'mri', 'potencjaly');
         foreach ($danedemograficzne_wszystkich_pacjentow as $dane_pacjenta) {
-            //print_r($dane_pacjenta);
-            $pesel = '';
+
+            wp_insert_post( array(
+                'post_type' => 'dane_pacjenta',
+                'post_title' => $dane_pacjenta->Pesel,
+                'post_status' => 'publish',
+                'post_author' => $dane_pacjenta->Pesel,
+                 )
+            );
+
+
 
             if ( isset( $dane_pacjenta->Pesel )) $pesel = $dane_pacjenta->Pesel;
             else {echo '</BR>nie ma pesla'; return;}

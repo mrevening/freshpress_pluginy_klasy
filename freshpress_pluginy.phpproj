@@ -34,8 +34,10 @@
     <Compile Include="rejsm_superwtyczka\includes\class_user_dane.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_all_user_info.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_custom_design.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_dane_pacjenta_post_type.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_eq5d_post_type.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_listy.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_pacjent_post_type.php" />
     <Compile Include="zbedne pliki\rejsm_form_dane_demograficzne.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_listy2.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_msis_29_post_type.php" />

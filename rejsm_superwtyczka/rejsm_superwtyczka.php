@@ -27,6 +27,7 @@ require_once dirname(__FILE__) . '/includes/rejsm_custom_design.php';
 require_once dirname(__FILE__) . '/includes/rejsm_users_possibilities.php';
 require_once dirname(__FILE__) . '/includes/rejsm_msis_29_post_type.php';
 require_once dirname(__FILE__) . '/includes/rejsm_eq5d_post_type.php';
+require_once dirname(__FILE__) . '/includes/rejsm_dane_pacjenta_post_type.php';
 require_once dirname(__FILE__) . '/includes/rejsm_szpital_taxonomy_for_users.php';
 
 
