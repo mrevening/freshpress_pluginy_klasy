@@ -22,6 +22,7 @@
     <Compile Include=".idea\plugins.iml" />
     <Compile Include=".idea\vcs.xml" />
     <Compile Include=".idea\workspace.xml" />
+    <Compile Include="rejsm_superwtyczka\includes\5dtest.php" />
     <Compile Include="rejsm_superwtyczka\includes\css\css_custom_post_type.css" />
     <Compile Include="rejsm_superwtyczka\includes\css\css_style_dane_demograficzne.css" />
     <Compile Include="rejsm_superwtyczka\includes\images\logo-login.png" />
@@ -33,6 +34,7 @@
     <Compile Include="rejsm_superwtyczka\includes\add_styles.php" />
     <Compile Include="rejsm_superwtyczka\includes\class_user_dane.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_all_user_info.php" />
+    <Compile Include="rejsm_superwtyczka\includes\rejsm_create_new_custom_post_types.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_custom_design.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_dane_pacjenta_post_type.php" />
     <Compile Include="rejsm_superwtyczka\includes\rejsm_eq5d_post_type.php" />

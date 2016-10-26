@@ -1,12 +1,6 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: mrevening
- * Date: 2016-09-16
- * Time: 18:52
- */
-class class_user_dane {
+class form_fields {
     private $user;
     public $nazwa_id;
     private $Nazwa;
@@ -46,7 +40,7 @@ class class_user_dane {
         $this->Nazwa = $Nazwa;
         $this->typ = $typ;
         $this->wybory = $wybory;
-        $this->get_user_meta_method();
+        $this->metadata = get_user_meta($this->user->ID, $this->nazwa_id, true);
         array_push ( self::$lista_objektow, $this );
     }
     public function get_nazwa_id(){
@@ -61,9 +55,6 @@ class class_user_dane {
         if (substr($pesel, 9, 1) % 2 == 0) $plec = 1;
         else if (substr($pesel, 9, 1) % 2 == 1) $plec = 2;
         return $plec;
-    }
-    public function get_user_meta_method (){
-        $this->metadata = get_user_meta($this->user->ID, $this->nazwa_id, true);
     }
     public static function get_lista_objektow () {
         return self::$lista_objektow;
@@ -104,16 +95,6 @@ class class_user_dane {
                 </tr>
                 <?php
                 break;
-            case 'drop-down-dochod':
-                $zatrudnienie = get_user_meta($this->user->ID, 'zatrudnienie', true);
-                $this->show_hide = 'id="row-hide"';
-                if ($zatrudnienie != "2")   $this->show_hide .= ' style="display:none"';
-                else $this->show_hide = 'id="row-hide"';
-                $this->print_dropdown_list();
-                break;
-            case 'drop-down':
-                $this->print_dropdown_list();
-                break;
             case 'calendar-mri':
                 $daty = explode(', ', $this->metadata);
                 foreach ($daty as $data) $this->print_calendar($data);
@@ -124,3 +105,18 @@ class class_user_dane {
         self::$lista_objektow = array();
     }
 }
+class drop_down extends form_fields{
+    function print_it (){
+        $this->print_dropdown_list();
+    }
+}
+class drop_down_dochod extends drop_down {
+    function print_it () { 
+        $zatrudnienie = get_user_meta($this->user->ID, 'zatrudnienie', true);
+        $this->show_hide = 'id="row-hide"';
+        if ($zatrudnienie != "2")   $this->show_hide .= ' style="display:none"';
+        else $this->show_hide = 'id="row-hide"';
+        $this->print_dropdown_list();
+    }
+}
+

@@ -193,7 +193,6 @@ function new_modify_user_table_row( $val, $column_name, $user_id ) {
         case 'wywiad' :
         case 'danedemograficzne' :
         case 'diagnostyka' :
-        case 'szpital' :
         case 'msis_29' :
             return my_manage_users_columns ($column_name, $user_id);
         default:

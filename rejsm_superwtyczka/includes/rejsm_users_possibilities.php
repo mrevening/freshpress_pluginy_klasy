@@ -3,6 +3,13 @@ add_role( 'pacjent',
     'Pacjent',
     array(
         'read' => true,
+        'read_dane_pacjenta' => true,
+        'edit_dane_pacjenta' => true,
+        'publish_dane_pacjenta' => true,
+        'edit_dane_pacjentas' => true,
+        'delete_dane_pacjenta' => false,
+        'read_private_dane_pacjenta' => false,
+        'edit_others_dane_pacjenta' => false,
         'read_msis_29' => true,
         'edit_msis_29' => true,
         'publish_msis_29' => true,
@@ -34,6 +41,13 @@ add_role( 'lekarz',
         'add_users' => true,
         'create_users' => true,
         'edit_users' => true,
+        'read_dane_pacjenta' => true,
+        'edit_dane_pacjenta' => true,
+        'publish_dane_pacjenta' => true,
+        'edit_dane_pacjentas' => true,
+        'delete_dane_pacjenta' => false,
+        'read_private_dane_pacjenta' => false,
+        'edit_others_dane_pacjenta' => false,
         'read_private_msis_29' => true,
         'edit_others_msis_29' => true,
         'read_msis_29' => true,
@@ -121,6 +135,8 @@ update_option( 'users_can_register', '1');
 function wpse126922_remove_newpost($wp_admin_bar) {
     $wp_admin_bar->remove_node('new-eq5d');
     $wp_admin_bar->remove_node('new-msis_29');
+    $wp_admin_bar->remove_node('new-dane_pacjenta');
+
 }
 function hide_add_new() {
     //    global $submenu;
