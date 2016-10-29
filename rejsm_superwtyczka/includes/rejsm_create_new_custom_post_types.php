@@ -1,21 +1,23 @@
 <?php
 require_once dirname(__FILE__) . '/add_styles.php';
 require_once dirname(__FILE__) . '/rejsm_class_form_fields.php';
-require_once dirname(__FILE__) . '/rejsm_listy.php';
 
 class new_custom_post_type {
     protected $roles = array ('administrator', 'pacjent', 'lekarz');
     static protected $menu_position = 101;
     static protected $metabox_nr = 1;
     public function __construct(){
+
+//        add_filter('rewrite_rules_array', array($this, 'add_rewrite_rules'));
         add_action ('init', array($this,'rejsm_add_custom_post_types'));
         add_action( 'add_meta_boxes', array($this,'rejsm_create_metaboxes'));
         add_action( 'save_post', array($this, 'rejsm_save_meta') );
         add_action( 'admin_enqueue_scripts', array($this, 'rejsm_css_add_style'));
         add_filter( 'redirect_post_location', array($this, 'rejsm_redirect_after_save') );
         add_filter( 'wp_insert_post_data' , array($this, 'rejsm_modify_title'));
-        add_action( 'personal_options_update', array($this, 'rejsm_update_metadata'));
-        add_action( 'edit_user_profile_update', array($this, 'rejsm_update_metadata'));
+//        add_action( 'personal_options_update', array($this, 'rejsm_update_metadata'));
+//        add_action( 'edit_user_profile_update', array($this, 'rejsm_update_metadata'));
+
     }
     public function __destructor(){
         new_custom_post_type::$metabox_nr = 1;
@@ -65,6 +67,8 @@ class new_custom_post_type {
         }
     }
     public function rejsm_create_metaboxes() {
+
+
         remove_meta_box('slugdiv', $this->post_type_name, 'normal');
         $metabox = new_custom_post_type::$metabox_nr;
         foreach ($this->lista_naglowkow as $naglowek){
@@ -72,6 +76,7 @@ class new_custom_post_type {
         }
     }
     public function rejsm_save_meta( $post_id ) {
+//        get_query_var('user_id')
         $liczba_naglowkow = count($this->lista_naglowkow);
         for ($i =1; $i<=$liczba_naglowkow; $i++){
             $name='rejsm_'.$this->post_type_name.'_'.$i;
@@ -86,22 +91,16 @@ class new_custom_post_type {
     }
     public function rejsm_modify_title( $data ) {
 //        var_dump(get_userdata($data['post_author'])->user_login);
-        $title = $data['post_type'] . '_' . get_userdata($data['post_author'])->user_login . '_' . $data['post_date'];
+//        $title = $data['post_type'] . '_' . get_userdata($data['post_author'])->user_login . '_' . $data['post_date'];
+        $title = get_userdata($data['post_author'])->user_login;
         $data['post_title'] =  $title ;
         return $data; 
     }
-    public function rejsm_register_taxonomy() {
-        $args = array(
-                'label'             => $this->kategoria_label,
-                'hierarchical'      => false,
-                'show_ui'           => true,
-                'show_admin_column' => true,
-                'meta_box_cb'       => array($this,'rejsm_wynik_meta_box'),
-        'show_admin_column ' => true,
-        );
-        register_taxonomy( 'kategoria_'.$this->post_type_name, $this->post_type_name, $args );
+    public function add_rewrite_rules($aRules) {
+        $aNewRules = array('user_id=([^/]+)/?$' => 'user_id=$matches[1]');
+        $aRules = $aNewRules + $aRules;
+        return $aRules;
     }
-
     public function rejsm_redirect_after_save( $location, $post_id ) {
 //        if ( 'eq5d' == get_post_type( $post_id ) ) {
             $location = admin_url( 'edit.php?post_type='.get_post_type( $post_id ) );
@@ -118,8 +117,26 @@ class new_custom_post_type {
         //add_filter( 'wpcf7_support_html5_fallback', '__return_true' );
     }
     public function rejsm_print_metabox ($user){
+//        global $wp_query;
+//        if( !isset($wp_query->query_vars['user_id'])) {
+//        echo 'nie ustawiona user_id';}
+//        if( !isset($wp_query)) {
+//        echo 'nie ustawiona query';}
+//        else    var_dump($wp_query);
+//        
+//        $post_type_object = get_post_type_object( $wp_query->query_vars['user_id'] );
+//      echo $post_type_object;
+//            
+//        $userid= get_query_var( 'paged','true' );
+//        var_dump ($user_id);
+//            $sMsdsCat = urldecode($wp_query->query_vars['msds_pif_cat']);
+//}
+        ?> 
+        <!--<div class="ankieta">--> 
+        <table class="form-table">
+            <tbody>
 
-        ?> <div class="ankieta"> <?php
+        <?php 
         $metabox = new_custom_post_type::$metabox_nr;
         foreach ($this->lista_pytan[$metabox-1] as $key => $value){
             new form_field($user, $key, $value[0], $value[1], $this->wybory[$metabox-1][$key]);
@@ -129,9 +146,50 @@ class new_custom_post_type {
             $objekt->print_it();
             ?> </p> <?php
         }
-        ?></div><?php
+        
+        
+        
+        ?>
+        <!--</div>-->
+            </tbody>
+        </table>        <?php
+
+        
+        
+        
         form_field::reset_lista_objektow();
         new_custom_post_type::$metabox_nr++;
+    }
+    public function rejsm_update_metadata( $userid ) {
+        foreach ($this->lista_nazw as $nazwa => $value)
+            if( isset( $_POST['key_'.$nazwa] ) ) {
+                update_user_meta( $userid, $nazwa, $_POST['key_'.$nazwa]);
+            }
+    }
+
+}
+class ankieta extends new_custom_post_type{
+    public function __construct() {
+        parent::__construct();
+        $this->labels = $this->rejsm_labels();
+        add_action( 'init', array($this, 'rejsm_register_taxonomy' ));
+        add_action( 'init', array($this, 'rejsm_add_taxonomy_terms' ));
+        add_action( 'publish_'.$this->post_type_name, array($this, 'rejsm_add_taxonomy_to_post' ));
+        add_filter( 'manage_edit-'.$this->post_type_name.'_columns', array($this, 'rejsm_edit_columns' )) ;
+        add_action( 'manage_'.$this->post_type_name.'_posts_custom_column', array($this, 'rejsm_manage_columns'), 10, 2 );
+        add_filter( 'manage_edit-'.$this->post_type_name.'_sortable_columns', array($this, 'rejsm_sortable_column') );
+        add_action( 'pre_get_posts', array($this, 'rejsm_orderby') );
+    }
+    public function rejsm_register_taxonomy() {
+        $args = array(
+                'label'             => $this->kategoria_label,
+                'hierarchical'      => false,
+                'show_ui'           => true,
+                'show_admin_column' => true,
+                'meta_box_cb'       => array($this,'rejsm_wynik_meta_box'),
+        'show_admin_column ' => true,
+        );
+        register_taxonomy( 'kategoria_'.$this->post_type_name, $this->post_type_name, $args );
     }
     public function rejsm_add_taxonomy_terms () {
         foreach ($this->kategoria as $cat){
@@ -151,77 +209,40 @@ class new_custom_post_type {
         wp_set_object_terms( $post_id, $kategoria, 'kategoria_'.$this->post_type_name,  false );
         update_post_meta($post_id, '_'.$this->post_type_name.'_wynik', $wynik );//strip_tags($_POST[$name3]));
     }
-    public function rejsm_update_metadata( $userid ) {
-        foreach ($this->lista_nazw as $nazwa => $value)
-            if( isset( $_POST['key_'.$nazwa] ) ) {
-                update_user_meta( $userid, $nazwa, $_POST['key_'.$nazwa]);
-            }
+    public function rejsm_labels (){
+        $nazwa = $this->post_type_title;
+        $labels = array(
+            'name'               => 'Ankieta '.$nazwa,
+            'singular_name'      => 'Ankieta '.$nazwa,
+            'menu_name'          => 'Ankiety '.$nazwa,
+            'name_admin_bar'     => 'Ankiety '.$nazwa, 
+            'add_new'            => 'Dodaj nową ankietę',
+            'add_new_item'       => 'Wypełnij nową ankietę '.$nazwa,
+            'new_item'           => 'Nowa ankieta',
+            'edit_item'          => 'Edytuj ankietę',
+            'view_item'          => 'Zobacz ankietę',
+            'all_items'          => 'Wszystkie ankiety',
+            'search_items'       => 'Szukaj ankiety',
+            'parent_item_colon'  => 'Ankiety dziedziczone',
+            'not_found'          => 'Nie znaleziono ankiety.',
+            'not_found_in_trash' => 'Nie znaleziono ankiety w koszu.',
+         );
+         return $labels;
     }
-
-}
-class ankieta extends new_custom_post_type{
-    public function __construct() {
-        parent::__construct();
-        add_action( 'init', array($this, 'rejsm_register_taxonomy' ));
-        add_action( 'init', array($this, 'rejsm_add_taxonomy_terms' ));
-        add_action( 'publish_'.$this->post_type_name, array($this, 'rejsm_add_taxonomy_to_post' ));
-        add_filter( 'manage_edit-'.$this->post_type_name.'_columns', array($this, 'rejsm_edit_columns' )) ;
-        add_action( 'manage_'.$this->post_type_name.'_posts_custom_column', array($this, 'rejsm_manage_columns'), 10, 2 );
-     }
     public function rejsm_edit_columns( $columns ) {
         $columns = array(
             'cb' => '<input type="checkbox" />',
         );
-        if( current_user_can('lekarz') || current_user_can('administrator') )  {
-            $columns = array_merge($columns,  array( 'author' => __( 'Pacjent' ),  ));
-        }
-        $columns = array_merge($columns, array( 'kategoria' => __( $this->kategoria_label ),  $this->post_type_name.'_wynik' => __( 'Wynik' ), 'date' => __( 'Date' )  ));
+        $columns = array_merge($columns, array( 'title' => 'Pacjent', 'author' => __( 'Pacjent' ), 'kategoria' => __( $this->kategoria_label ),  $this->post_type_name.'_wynik' => __( 'Wynik' ), 'date' => __( 'Date' )  ));
         return $columns;
     }
     public function rejsm_manage_columns( $column, $post_id ) {
-	global $post;
+        global $post;
         switch( $column ) {
-            case $this->post_type_name.'_wynik' :
-                //$wynik = msis_29_get_result($post_id);
-                $wynik = get_post_meta($post_id, '_'.$this->post_type_name.'_wynik', true);
-                if (is_null($wynik)) {
-                    $out = sprintf('<a href="%s">%s</a>',
-                        esc_url(add_query_arg(array('post' => $post_id, 'action' => 'edit'), 'post.php')), 'N/A');
-                }
-                else {
-                    $out = sprintf('<a href="%s">%s</a>',
-                        esc_url( add_query_arg( array( 'post' => $post_id, 'action' => 'edit' ), 'post.php' ) ), $wynik    );
-    //                    esc_html( sanitize_term_field( 'name', $wynik->name, $term->term_id, 'wynik_msis_29', 'display' ) )
-                }
-                echo $out;
-                break;
-            case 'wynik_msis_29' :
-
-                   /* Get the post meta. */
-                   //$wynik = msis_29_get_result($post_id);
-                   $wynik = get_post_meta($post_id, '_msis_29_wynik', true);
-
-                   /* If no duration is found, output a default message. */
-                   if (is_null($wynik)) {
-                       $out = sprintf('<a href="%s">%s</a>',
-                           esc_url(add_query_arg(array('post' => $post_id, 'action' => 'edit'), 'post.php')), 'N/A');
-                   }
-                   /* If there is a duration, append 'minutes' to the text string. */
-                   else {
-                       $out = sprintf('<a href="%s">%s</a>',
-                           esc_url( add_query_arg( array( 'post' => $post_id, 'action' => 'edit' ), 'post.php' ) ), $wynik    ); ///$wynik
-                       //                    esc_html( sanitize_term_field( 'name', $wynik->name, $term->term_id, 'wynik_msis_29', 'display' ) )
-
-                   }
-                   echo $out;
-                   break;
             case 'kategoria' :
-                /* Get the genres for the post. */
                 $terms = get_the_terms( $post_id, 'kategoria_'.$this->post_type_name );
-                /* If terms were found. */
                 if ( !empty( $terms ) ) {
                     $out = array();
-                    /* Loop through each term, linking to the 'edit posts' page for the specific term. */
                     foreach ( $terms as $term ) {
                         $out[] = sprintf( '<a href="%s">%s</a>',
                             esc_url( add_query_arg( array( 'post_type' => $post->post_type, 'kategoria_'.$this->post_type_name => $term->slug ), 'edit.php' ) ),
@@ -233,10 +254,52 @@ class ankieta extends new_custom_post_type{
                 else {
                     _e( 'Brak wyniku' );
                 }
+            break;
+            case $this->post_type_name.'_wynik' :
+                $wynik = get_post_meta($post_id, '_rejsm_'.$this->post_type_name.'_wynik', true);
+                if (is_null($wynik)) {
+                    $out = sprintf('<a href="%s">%s</a>',
+                        esc_url(add_query_arg(array('post' => $post_id, 'action' => 'edit'), 'post.php')), 'N/A');
+                }
+                else {
+                    $out = sprintf('<a href="%s">%s</a>',
+                        esc_url( add_query_arg( array( 'post' => $post_id, 'action' => 'edit' ), 'post.php' ) ), $wynik    );
+    //                    esc_html( sanitize_term_field( 'name', $wynik->name, $term->term_id, 'wynik_msis_29', 'display' ) )
+                }
+                echo $out;
                 break;
+//            case 'wynik_msis_29' :
+//                   $wynik = get_post_meta($post_id, '_rejsm_msis_29_wynik', true);
+//                   if (is_null($wynik)) {
+//                       $out = sprintf('<a href="%s">%s</a>',
+//                           esc_url(add_query_arg(array('post' => $post_id, 'action' => 'edit'), 'post.php')), 'N/A');
+//                   }
+//
+//                   else {
+//                       $out = sprintf('<a href="%s">%s</a>',
+//                           esc_url( add_query_arg( array( 'post' => $post_id, 'action' => 'edit' ), 'post.php' ) ), $wynik    ); ///$wynik
+//                       //                    esc_html( sanitize_term_field( 'name', $wynik->name, $term->term_id, 'wynik_msis_29', 'display' ) )
+//
+//                   }
+//                   echo $out;
+//                   break;
+            
             /* Just break out of the switch statement for everything else. */
             default :
             break;
+        }
+    }
+    public function rejsm_sortable_column( $columns ) {
+        $columns[$this->post_type_name.'_wynik'] = $this->post_type_name.'_wynik';
+        return $columns;
+    }
+    public function rejsm_orderby( $query ) {
+        if( ! is_admin() )  return;
+//        var_dump($query);
+        $orderby = $query->get( 'orderby');
+        if( $this->post_type_name.'_wynik' == $orderby ) {
+            $query->set('meta_key','_rejsm_'.$this->post_type_name.'_wynik');
+            $query->set('orderby','meta_value_num');
         }
     }
 }
@@ -245,6 +308,26 @@ class dane_pacjenta extends new_custom_post_type{
         parent::__construct();
         add_filter( 'manage_edit-'.$this->post_type_name.'_columns', array($this, 'rejsm_edit_columns' )) ;
         add_action( 'manage_'.$this->post_type_name.'_posts_custom_column', array($this, 'rejsm_manage_columns'), 10, 2 );
+//        add_filter( 'query_vars', array($this, 'add_query_vars'));
+//        add_action( 'pre_get_posts', array($this, 'rejsm_add_query_variable'));
+    }    
+    public function add_query_vars($aVars) {
+        $aVars[] = "user_id"; 
+        return $aVars;
+    }
+    function rejsm_add_query_variable( $query ) {
+        if( ! is_admin() )  return;
+//        global $wp_query;
+//        $userid = $wp_query->query_vars[ 'user_id'];
+        $userid= get_query_var( 'user_id','true' );
+        if ($userid != 'NULL'){
+            $query->set('author',$userid);
+            $query->set('author_name',$userid);
+            $query->set('user_login',$userid);
+            $query->set('post_author',$userid);
+        }
+//        echo '<pre>';  var_dump($query);    echo '</pre>';
+//        echo "sfjaslkfdjlaf";var_dump($query);
     }
     public function rejsm_save_meta( $user_id ) {
         $liczba_naglowkow = count($this->lista_naglowkow);
@@ -259,8 +342,8 @@ class dane_pacjenta extends new_custom_post_type{
     public function rejsm_edit_columns( $columns ) {
         $columns = array(
             'cb' => '<input type="checkbox" />',
-            'title' => 'tytul',
-            'author' => __( 'Pacjent' ),
+            'title' => 'Pacjent',
+//            'author' => __( 'Pacjent' ),
             'date' => __( 'Date' ),
         );
 //        $columnyKeys=array();
@@ -330,6 +413,8 @@ class dane_pacjenta extends new_custom_post_type{
             break;
         }
     }
+
+    
 }
 class msis_29 extends ankieta {
     public function __construct() {
@@ -338,6 +423,7 @@ class msis_29 extends ankieta {
     }
     protected $numer_pytania = 1;
     protected $post_type_name = 'msis_29';
+    protected $post_type_title = 'MSIS-29';
     protected $kategoria_label = 'Wpływ choroby';
     protected $kategoria = array(
         array ('minimalny', 0 ,29),
@@ -345,24 +431,8 @@ class msis_29 extends ankieta {
         array ('mocny',59 ,87),
         array ('bardzo mocny', 88 ,116),
     );
-    protected $labels = array(
-        'name'               => 'Ankieta MSIS-29',
-        'singular_name'      => 'Ankieta',
-        'menu_name'          => 'Ankiety MSIS-29',
-        'name_admin_bar'     => 'Ankietę MSIS-29', 
-        'add_new'            => 'Dodaj nową ankietę',
-        'add_new_item'       => 'Wypełnij nową ankietę MSIS 29',
-        'new_item'           => 'Nowa ankieta',
-        'edit_item'          => 'Edytuj ankietę',
-        'view_item'          => 'Zobacz ankietę',
-        'all_items'          => 'Wszystkie ankiety',
-        'search_items'       => 'Szukaj ankiety',
-        'parent_item_colon'  => 'Ankiety dziedziczone',
-        'not_found'          => 'Nie znaleziono ankiety.',
-        'not_found_in_trash' => 'Nie znaleziono ankiety w koszu.',
-    );
     protected $description = "Skala wpływu stwardnienia rozsianego (MSIS-29).";
-    protected $menu_icon = 'dashicons-pressthis';
+    protected $menu_icon = 'dashicons-format-aside';
     protected $lista_naglowkow = array(
         'W ciągu ostatnich 14 dni jak bardzo stwardnienie rozsiane ograniczyło Pani/Pana zdolność do:',
         'Wciągu ostatnich 14 dni jak bardzo przeszkadzały Pani/Panu:',
@@ -438,28 +508,13 @@ class msis_29 extends ankieta {
 class eq5d extends ankieta {
     protected $nr_pytania = 1;
     protected $post_type_name = 'eq5d';
+    protected $post_type_title = 'EQ-5D';
     protected $kategoria_label = 'Samopoczucie';
-    protected $kategoria = array(
+    public $kategoria = array(
         array ('bardzo złe', 1 ,25),
         array ('złe', 26 ,50),
         array ('dobre',51 ,75),
         array ('bardzo dobre', 76 ,100),
-    );
-    protected $labels = array(
-        'name'               => 'Ankieta EQ-5D',
-        'singular_name'      => 'Ankieta',
-        'menu_name'          => 'Ankiety EQ-5D',
-        'name_admin_bar'     => 'Ankietę EQ-5D',
-        'add_new'            => 'Dodaj nową ankietę',
-        'add_new_item'       => 'Wypełnij nową ankietę EQ-5D',
-        'new_item'           => 'Nowa ankieta',
-        'edit_item'          => 'Edytuj ankietę',
-        'view_item'          => 'Zobacz ankietę',
-        'all_items'          => 'Wszystkie ankiety',
-        'search_items'       => 'Szukaj ankiety',
-        'parent_item_colon'  => 'Ankiety dziedziczone',
-        'not_found'          => 'Nie znaleziono ankiety.',
-        'not_found_in_trash' => 'Nie znaleziono ankiety w koszu.',
     );
     protected $description = "Skala wpływu stwardnienia rozsianego (EQ-5D).";
     protected $menu_icon = 'dashicons-clipboard';
@@ -502,6 +557,9 @@ class eq5d extends ankieta {
     }
 }
 class dane_demograficzne extends dane_pacjenta {
+    public function __construct() {
+        parent::__construct();
+    }
     protected $post_type_name = 'dane_demograficzne';
     protected $labels = array(
         'name'               => 'Dane demograficzne',
@@ -522,10 +580,16 @@ class dane_demograficzne extends dane_pacjenta {
     protected $description = "Wszystkie dane demograficzne";
     protected $menu_icon = 'dashicons-groups';
     protected $lista_naglowkow = array(
+        'Podstawowe dane',
         'Dane demograficzne', 
         'Aktywność'
     );
     protected $lista_pytan = array(
+        array(
+            'DataUrodzenia'=> array('Data urodzenia','calendar-data-urodzenia'),
+            'Wiek'=> array('Wiek','wiek'),
+            'Plec'=> array('Płeć','drop-down-plec'),
+        ),
         array(
             'MiejsceZamieszkania' => array('Miejsce zamieszkania','drop-down'),
             'Wojewodztwo' => array('Województwo','drop-down'),
@@ -543,6 +607,11 @@ class dane_demograficzne extends dane_pacjenta {
     );
     protected $wybory = array (
         array(
+            'DataUrodzenia'=> array(),
+            'Wiek'=> array(),
+            'Plec'=> array('Kobieta','Mężczyzna' ),
+        ),
+        array(
             'MiejsceZamieszkania' => array('Miasto', 'Wieś',),
             'Wojewodztwo' => array('dolnośląskie', 'kujawsko-pomorskie', 'lubelskie', 'lubuskie', 'łódzkie', 'małopolskie', 'mazowieckie', 'opolskie', 'podkarpackie', 'podlaskie', 'pomorskie', 'śląskie', 'świętokrzyskie', 'warmińsko-mazurskie', 'wielkopolskie', 'zachodniopomorskie'),
             'StanRodzinny'=>array('Panna/Kawaler', 'Zamężna/Żonaty', 'Rozwiedziona/Rozwiedziony', 'Wdowa/Wdowiec'),
@@ -558,9 +627,264 @@ class dane_demograficzne extends dane_pacjenta {
 //        'Data_zgonu'=>array(),
     );
 }
+class wywiad extends dane_pacjenta{
+    public function __construct() {
+        parent::__construct();
+    }
+    protected $post_type_name = 'wywiad';
+    protected $labels = array(
+        'name'               => 'Wywiad',
+        'singular_name'      => 'Wywiad',
+        'menu_name'          => 'Wywiad',
+        'name_admin_bar'     => 'Wywiad',
+        'add_new'            => 'Dodaj wywiad',
+        'add_new_item'       => 'Wypełnij nowy wywiad',
+        'new_item'           => 'Nowy wywiad',
+        'edit_item'          => 'Edytuj wywiad',
+        'view_item'          => 'Zobacz wywiad',
+        'all_items'          => 'Wszystkie wywiady',
+        'search_items'       => 'Szukaj wywiadu', 
+        'parent_item_colon'  => 'Rodzic:',
+        'not_found'          => 'Nie znaleziono wywiadu.',
+        'not_found_in_trash' => 'Nie znaleziono wywiadu w koszu.',
+    );
+    protected $description = "Wszystkie wywiady";
+    protected $menu_icon = 'dashicons-format-chat';
+    protected $lista_naglowkow = array(
+        'Wywiad',
+        'Choroby współistniejące', 
 
+    );
+    protected $lista_pytan = array(
+        array (
+            'PierwszeObjawy'=> array( 'Pierwsze objawy', 'drop-down'),
+            'PierwszeObjawyData' => array ('Pierwsze objawy (miesiąc / rok)', 'calendar'),
+            'DiagnozaSM' => array ('Data diagnozy SM (miesiąc / rok)', 'calendar'),
+            'ZapalenieNerwowWzrokowych'=>array('Zapalenie nerwów wzrokowych:', 'drop-down'),
+            'PostacSM'=>array('Postać SM:','drop-down'),
+            'KryteriumMcDonald'=>array('Czy spełnia kryteria McDonalda (2010):','drop-down'),
+        ),
+        array (
+            'NadcisnienieTetnicze'=>array ('Nadciśnienie tętnicze', 'drop-down'),
+            'Cukrzyca'=>array('Cukrzyca','drop-down'),
+            'Tarczyca'=>array('Choroby tarczycy','drop-down'),
+            'ZakrzepowoZatorowe'=>array('Choroby zakrzepowo-zatorowe','drop-down'),
+            'Nowotwory'=>array('Nwotwory','drop-down'),
+        ),
+
+    );
+    protected $wybory = array(
+        array(
+            'PierwszeObjawy' => array( 'Wzrokowe','Czuciowe','Piramidowe','Móżdżkowe','Inne'),
+            'PierwszeObjawyData' =>array(),
+            'DiagnozaSM' => array(),
+            'ZapalenieNerwowWzrokowych'=>array('Tak', 'Nie'),
+            'PostacSM'=> array( 'Rzutowo-Remisyjna (RR)', 'Wtórnie Przewlekła (SP)', 'Pierwotnie Przewlekła (PP)', 'Rzutowo-Przewlekła' ),
+            'KryteriumMcDonald'=> array( 'Tak', 'Nie'),
+        ),
+        array(
+            'NadcisnienieTetnicze'=>array( 'Tak', 'Nie' ),
+            'Cukrzyca'=>array( 'Tak', 'Nie' ),
+            'Tarczyca'=>array( 'Tak', 'Nie' ),
+            'ZakrzepowoZatorowe'=>array( 'Tak', 'Nie' ),
+            'Nowotwory'=> array('Tak', 'Nie'), 
+        ),
+    );
+}
+class diagnostyka extends dane_pacjenta {
+    public function __construct() {
+        parent::__construct();
+    }
+    protected $post_type_name = 'diagnostyka';
+    protected $labels = array(
+        'name'               => 'Diagnostyka',
+        'singular_name'      => 'Diagnostyka',
+        'menu_name'          => 'Diagnostyka',
+        'name_admin_bar'     => 'Diagnostyka',
+        'add_new'            => 'Dodaj diagnostyke',
+        'add_new_item'       => 'Wypełnij nową diagnostyke',
+        'new_item'           => 'Nowa diagnostyka',
+        'edit_item'          => 'Edytuj diagnostyke',
+        'view_item'          => 'Zobacz diagnostyke',
+        'all_items'          => 'Wszystkie diagnostyki',
+        'search_items'       => 'Szukaj diagnostyke', 
+        'parent_item_colon'  => 'Rodzic:',
+        'not_found'          => 'Nie znaleziono diagnostyki.',
+        'not_found_in_trash' => 'Nie znaleziono diagnostyki w koszu.',
+    );
+    protected $description = "Wszystkie dane diagnostyczne";
+    protected $menu_icon = 'dashicons-welcome-view-site';
+    protected $lista_naglowkow = array(
+        'Rezonans Magnetyczny - data badania',
+        'Badanie potencjałów wzrokowych', 
+        'Badanie płynu mózgowo-rdzeniowego'
+    );
+    protected $lista_pytan = array(
+        array(
+            
+        ),
+        array(
+           
+        ),
+         array(
+            
+        ),    
+    );
+    protected $wybory = array (
+        array(
+         
+        ),
+        array(
+          
+        ),
+        array(
+       
+        ),
+    );
+}
+class leczenie extends dane_pacjenta {
+    public function __construct() {
+        parent::__construct();
+    }
+    protected $post_type_name = 'leczenie';
+    protected $labels = array(
+        'name'               => 'Leczenie',
+        'singular_name'      => 'Leczenie',
+        'menu_name'          => 'Leczenie',
+        'name_admin_bar'     => 'Leczenie',
+        'add_new'            => 'Dodaj leczenie',
+        'add_new_item'       => 'Wypełnij nowe leczenie',
+        'new_item'           => 'Nowe leczenie',
+        'edit_item'          => 'Edytuj leczenie',
+        'view_item'          => 'Zobacz leczenie',
+        'all_items'          => 'Wszystkie leczenia',
+        'search_items'       => 'Szukaj leczenia', 
+        'parent_item_colon'  => 'Rodzic:',
+        'not_found'          => 'Nie znaleziono leczenia.',
+        'not_found_in_trash' => 'Nie znaleziono leczenia w koszu.',
+    );
+    protected $description = "Wszystkie leczenia";
+    protected $menu_icon = 'dashicons-shield';
+    protected $lista_naglowkow = array(
+        'Immunomodulujące',
+        'Immunosupresyjne - Solu-Medrol', 
+        'Objawowe'
+    );
+    protected $lista_pytan = array(
+        array(
+
+        ),
+        array(
+
+        ),
+         array(
+
+        ),
+    );
+    protected $wybory = array (
+        array(
+
+        ),
+        array(
+
+        ),
+        array(
+
+        ),
+    );
+}
+class aktualne_wyniki extends dane_pacjenta {
+    public function __construct() {
+        parent::__construct();
+    }
+    protected $post_type_name = 'aktualne_wyniki';
+    protected $labels = array(
+        'name'               => 'Aktualne wyniki',
+        'singular_name'      => 'Aktualne wyniki',
+        'menu_name'          => 'Aktualne wyniki',
+        'name_admin_bar'     => 'Aktualne wyniki',
+        'add_new'            => 'Dodaj aktualne wyniki',
+        'add_new_item'       => 'Wypełnij nowe wyniki',
+        'new_item'           => 'Nowe wyniki',
+        'edit_item'          => 'Edytuj wyniki',
+        'view_item'          => 'Zobacz wyniki',
+        'all_items'          => 'Wszystkie wyniki',
+        'search_items'       => 'Szukaj wyniki', 
+        'parent_item_colon'  => 'Rodzic:',
+        'not_found'          => 'Nie znaleziono wyników.',
+        'not_found_in_trash' => 'Nie znaleziono wyników w koszu.',
+    );
+    protected $description = "Wszystkie aktualne wyniki";
+    protected $menu_icon = 'dashicons-chart-line';
+    protected $lista_naglowkow = array(
+        'Stan funkcjonalny',
+        'Zmęczenie i depresja', 
+    );
+    protected $lista_pytan = array(
+        array(
+
+        ),
+        array(
+
+        ),
+    );
+    protected $wybory = array (
+        array(
+
+        ),
+        array(
+
+        ),
+    );
+}
+class ocena_klinimetryczna extends dane_pacjenta {
+    public function __construct() {
+        parent::__construct();
+    }
+    protected $post_type_name = 'ocena_klinimetryczna';
+    protected $labels = array(
+        'name'               => 'Ocena klinimetryczna',
+        'singular_name'      => 'Ocena klinimetryczna',
+        'menu_name'          => 'Ocena klinimetryczna',
+        'name_admin_bar'     => 'Ocena klinimetryczna',
+        'add_new'            => 'Dodaj ocenę klinimetryczną',
+        'add_new_item'       => 'Wypełnij nową ocenę klinimetryczną',
+        'new_item'           => 'Nowa ocena klinimetryczna',
+        'edit_item'          => 'Edytuj ocenę klinimetryczną',
+        'view_item'          => 'Zobacz ocenę klinimetryczną',
+        'all_items'          => 'Wszystkie oceny klinimetryczne',
+        'search_items'       => 'Szukaj oceny klinimetrycznej', 
+        'parent_item_colon'  => 'Rodzic:',
+        'not_found'          => 'Nie znaleziono oceny klinimetrycznej.',
+        'not_found_in_trash' => 'Nie znaleziono oceny klinimetrycznej w koszu.',
+    );
+    protected $description = "Wszystkie oceny klinimetryczne";
+    protected $menu_icon = 'dashicons-forms';
+    protected $lista_naglowkow = array(
+        'EDSS',
+        'Ambulation Index', 
+        'MSFC',
+        'VFT/SDMT',
+        'Zmęczenie i depresja'
+    );
+    protected $lista_pytan = array(
+        array(  ),
+        array(  ),
+        array(  ),      
+        array(  ),   
+        array(  ),   
+    );
+    protected $wybory = array (
+    );
+}
+$dane_demograficzne = new dane_demograficzne();
+$wywiad = new wywiad();
+$diagnostyka = new diagnostyka();
+$lecznie = new leczenie();
+$aktualne_wyniki = new aktualne_wyniki();
+$ocena_klinimetryczna = new ocena_klinimetryczna();
 $msis_29 = new msis_29();
 $eq5d = new eq5d();
-$dane_demograficzne = new dane_demograficzne();
+
 
 

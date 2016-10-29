@@ -5,9 +5,7 @@
  * Date: 2016-09-16
  * Time: 18:54
  */
-require_once ABSPATH . '/wp-includes/pluggable.php' ; //błąd wordpressa, musi być ta komenda.
-error_reporting(E_ALL);
-ini_set('display_errors', 1); //raportowanie błędów. POTEM USUNĄĆ
+
 
 
 

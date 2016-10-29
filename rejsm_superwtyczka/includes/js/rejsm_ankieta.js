@@ -5,7 +5,7 @@
 
 
 jQuery(document).ready(function($) {
-    $("#zatrudnienie").change(function () {
+    $("#Zatrudnienie").change(function () {
         var control = $(this);
         if (control.val() == "2") {
             $("#row-hide").show();

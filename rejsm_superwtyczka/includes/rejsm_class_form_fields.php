@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . '/rejsm_class_pesel.php';
 
 /**
  * Created by PhpStorm.
@@ -13,7 +14,7 @@ class form_field {
     private $typ;
     private $wybory = array();
     private $metadata;
-    private $show_hide = '';
+//    private $show_hide = '';
     static private $lista_objektow = array();
     public function __construct($post, $nazwa_id, $Nazwa, $typ, $wybory){
         $this->post = $post;
@@ -55,16 +56,13 @@ class form_field {
     public function get_nazwa_id(){
         return $this->nazwa_id;
     }
-    public function get_typ(){
-            return $this->typ;
-        }
-    public function get_plec(){
-        $pesel = $this->user->user_login;
-        $plec = 0;
-        if (substr($pesel, 9, 1) % 2 == 0) $plec = 1;
-        else if (substr($pesel, 9, 1) % 2 == 1) $plec = 2;
-        return $plec;
-    }
+//    public function get_plec(){
+//        $pesel = get_the_author_meta('user_login',$this->post->post_author);
+//        $plec = 0;
+//        if (substr($pesel, 9, 1) % 2 == 0) $plec = 1;
+//        else if (substr($pesel, 9, 1) % 2 == 1) $plec = 2;
+//        return $plec;
+//    }
     public static function get_lista_objektow () {
         return self::$lista_objektow;
     }
@@ -74,6 +72,74 @@ class form_field {
         }
     }
     public function print_it () {
+        $pesel = new Pesel(get_the_author_meta('user_login',$this->post->post_author));
+        
+        $disabled ='';
+        $show_hide ='';
+        switch ($this->typ){
+            case 'drop-down-plec':
+                $this->metadata = $pesel->getSex();
+                $disabled ='disabled';
+                break;
+            case 'drop-down-dochod':
+                $show_hide = 'id="row-hide"';
+                $zatrudnienie = get_user_meta($this->post->post_author, 'zatrudnienie', true);
+                if ($zatrudnienie != "2")   $show_hide .= ' style="display:none"';
+                break;
+            case 'drop-down-porody':
+                if ($pesel->getSex() == 2) $show_hide .= ' style="display:none"';
+                break;
+            case 'drop-down':
+                break;
+            
+            case 'wiek':
+                $this->metadata = $pesel->getAge("%y");
+                
+                break;
+            case 'calendar-data-urodzenia':
+                $this->metadata = $pesel->getBirthday()->format("d-m-Y");
+                $disabled ='disabled';
+                break;
+            case 'calendar-mri':
+                $daty = explode(', ', $this->metadata);
+                foreach ($daty as $data) $this->print_calendar($data);
+                break;
+            case 'calendar':
+                break;
+        }
+        
+        
+
+        ?><tr <?php echo $show_hide; ?>>
+        <th scope="row">
+            <label for="<?php echo $this->nazwa_id;?>"><?php echo $this->Nazwa ?></label>
+        </th>
+        <td><?php
+        if (substr($this->typ , 0, 9) == 'drop-down'){
+            ?>
+                <select id="<?php echo $this->nazwa_id ?>" class="<?php echo $this->typ ?>" name="<?php echo 'key_'.$this->nazwa_id ?>" <?php echo $disabled; ?>>
+                    <option disabled selected value></option>
+                    <?php $i = 1; ?>
+                    <?php foreach ($this->wybory as $wybor) { 
+//                        if ($this->typ == 'drop-down') ?>
+                        <option value="<?php echo $i ?>"<?php selected($i, $this->metadata);?>><?php echo $wybor; $i++; ?></option><?php
+                     } ?>
+                </select>
+            <?php
+        }
+        if (substr($this->typ , 0, 8) == 'calendar'){
+            ?>
+                <input id="<?php echo $this->nazwa_id ?>" type="text" class="MyDate" name="key_<?php echo $this->nazwa_id ?>" value="<?php echo $this->metadata; ?>" <?php echo $disabled; ?>/>
+            <?php
+        }
+        if ($this->typ =='wiek'){
+            echo $this->metadata;
+        }
+        
+        ?>
+        </td></tr><?php
+    }
+    public function print_it2 () {
         switch ($this->typ){
             case 'calendar':
                 $this->print_calendar($this->metadata);

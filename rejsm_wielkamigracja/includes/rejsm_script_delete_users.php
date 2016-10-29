@@ -4,7 +4,7 @@ function my_delete_user($user_id) {
 
     $args = array (
         'numberposts' => -1,
-        'post_type' => array ('msis_29', 'eq5d'),
+        'post_type' => array ('msis_29', 'eq5d','dane_demograficzne'),
         'author' => $user_id
     );
 

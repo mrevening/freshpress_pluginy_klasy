@@ -12,6 +12,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 //load_plugin_textdomain( 'rejsm_superwtyczka', false, 'rejsm_superwtyczka/languages' );
 
+require_once ABSPATH . '/wp-includes/pluggable.php' ; //błąd wordpressa, musi być ta komenda.
 
 //Add bootstrap
 //function rejsm_enqueue_bootstrap_scripts() {
@@ -21,15 +22,18 @@ ini_set('display_errors', 1);
 
 
 require_once dirname(__FILE__) . '/includes/rejsm_registration_form_customize.php';
+require_once dirname(__FILE__) . '/includes/rejsm_custom_design.php';
+require_once dirname(__FILE__) . '/includes/rejsm_users_possibilities.php';
+require_once dirname(__FILE__) . '/includes/rejsm_szpital_taxonomy_for_users.php';
+require_once dirname(__FILE__) . '/includes/rejsm_create_new_custom_post_types.php';
+
 //require_once dirname(__FILE__) . '/includes/rejsm_form_dane_demograficzne.php';
 //require_once dirname(__FILE__) . '/includes/rejsm_all_user_info.php';
-require_once dirname(__FILE__) . '/includes/rejsm_custom_design.php';
-//require_once dirname(__FILE__) . '/includes/rejsm_users_possibilities.php';
+
 //require_once dirname(__FILE__) . '/includes/rejsm_msis_29_post_type.php';
 //require_once dirname(__FILE__) . '/includes/rejsm_eq5d_post_type.php';
 //require_once dirname(__FILE__) . '/includes/rejsm_dane_pacjenta_post_type.php';
-require_once dirname(__FILE__) . '/includes/rejsm_szpital_taxonomy_for_users.php';
-require_once dirname(__FILE__) . '/includes/rejsm_create_new_custom_post_types.php';
+
 
 
 

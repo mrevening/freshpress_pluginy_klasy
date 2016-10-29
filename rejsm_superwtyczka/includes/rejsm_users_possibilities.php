@@ -1,4 +1,6 @@
 <?php
+
+
 add_role( 'pacjent',
     'Pacjent',
     array(
