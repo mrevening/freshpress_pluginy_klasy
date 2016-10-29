@@ -1,6 +1,6 @@
 <?php
-
-class rejsm_migrate{
+require_once WP_PLUGIN_DIR.'/rejsm_superwtyczka/includes/rejsm_create_new_custom_post_types.php';
+class rejsm_migrate extends rejsm_parent{
     protected $db;
     protected $limit_users = ' ORDER BY PESEL ASC LIMIT 10';//' '; //WHERE PESEL LIKE 57112417752
     protected $limit_patients = ' ORDER BY PESEL ASC LIMIT 10';
@@ -24,6 +24,7 @@ class rejsm_migrate{
         return implode($pass); //turn the array into a string
     }
     protected function add_category_msis_29 ($wynik){
+//        $kategoria
         $kategoria = '';
         if ($wynik >= 0 && $wynik <= 29) $kategoria = 'minimalny';
         if ($wynik >= 30 && $wynik <= 58) $kategoria = 'średni';
@@ -274,6 +275,7 @@ class rejsm_migrate{
 class create_lekarze extends rejsm_migrate{
     public function __construct() {
         parent::__construct();
+        $this->create_lekarze();
     }
     public function create_lekarze (){
         $sql = "SELECT UserName, UserPassword, UserImie, UserNazwisko, SzpitalMiasto, Admin FROM users ".$this->limit_lekarze;
@@ -310,6 +312,7 @@ class create_lekarze extends rejsm_migrate{
 class create_users extends rejsm_migrate{
     public function __construct() {
         parent::__construct();
+        $this->create_users();
     }
        public function create_users (){
         $sql = "SELECT * FROM danedemograficzne " .$this->limit_users;
@@ -365,6 +368,7 @@ class create_users extends rejsm_migrate{
 class create_patients extends rejsm_migrate{
     public function __construct() {
         parent::__construct();
+        $this->create_patients();
     }
     public function create_patients(){
         $sql = "SELECT PESEL, email, password FROM patients  ".$this->limit_patients;
@@ -408,29 +412,36 @@ class create_patients extends rejsm_migrate{
     }
 }
 
-$create_lekarze = new create_lekarze();
-$create_lekarze->create_lekarze();
+
+
+
+//try {
+//    $create_lekarze = new create_lekarze();
+//} catch (Exception $e) {   
+//    echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
+//    echo $e->getMessage();
+//        }
+//if ( is_wp_error( $create_lekarze )) {
+//    echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
+//}
+//else {
+//    echo '<div id="message" class="updated">Pomyślnie wykonano skrypt - dodano lekarzy</div>';
+//}
+
+
 $create_patients = new create_patients();
-$create_patients->create_patients();
-$create_users = new create_users();
-$create_users->create_users();
 
-
-if ( is_wp_error( $create_lekarze )) {
-    echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
-}
-else {
-    echo '<div id="message" class="updated">Pomyślnie wykonano skrypt - dodano lekarzy</div>';
-}
 if ( is_wp_error( $create_patients )) {
     echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
 }
 else {
     echo '<div id="message" class="updated">Pomyślnie wykonano skrypt - dodano pacjentów</div>';
 }
-if ( is_wp_error( $create_users )) {
-    echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
-}
-else {
-    echo '<div id="message" class="updated">Pomyślnie wykonano skrypt - dodano użytkowników</div>';
-}
+
+//$create_users = new create_users();
+//if ( is_wp_error( $create_users )) {
+//    echo '<div id="message" class="error">Zaistniał błąd podczas wykonywania skryptu. '.$return->get_error_message().'</div>';
+//}
+//else {
+//    echo '<div id="message" class="updated">Pomyślnie wykonano skrypt - dodano użytkowników</div>';
+//}

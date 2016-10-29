@@ -2,7 +2,31 @@
 require_once dirname(__FILE__) . '/add_styles.php';
 require_once dirname(__FILE__) . '/rejsm_class_form_fields.php';
 
-class new_custom_post_type {
+abstract class rejsm_parent {
+    public function kategoria_dane($post_type){
+        $cat = array();
+        switch ($post_type){
+            case 'msis_29':
+                $cat = array(
+                   array ('bardzo złe', 1 ,25),
+                   array ('złe', 26 ,50),
+                   array ('dobre',51 ,75),
+                   array ('bardzo dobre', 76 ,100),
+               );
+               break;
+            case 'eq5d':
+                $cat =array(
+                    array ('minimalny', 0 ,29),
+                    array ('średni', 30 ,58),
+                    array ('mocny',59 ,87),
+                    array ('bardzo mocny', 88 ,116),
+                );
+                break;
+        }
+        return $cat;
+    }
+}
+class new_custom_post_type extends rejsm_parent {
     protected $roles = array ('administrator', 'pacjent', 'lekarz');
     static protected $menu_position = 101;
     static protected $metabox_nr = 1;
@@ -187,12 +211,12 @@ class ankieta extends new_custom_post_type{
                 'show_ui'           => true,
                 'show_admin_column' => true,
                 'meta_box_cb'       => array($this,'rejsm_wynik_meta_box'),
-        'show_admin_column ' => true,
+                'show_admin_column ' => true,
         );
         register_taxonomy( 'kategoria_'.$this->post_type_name, $this->post_type_name, $args );
     }
     public function rejsm_add_taxonomy_terms () {
-        foreach ($this->kategoria as $cat){
+        foreach (($this->kategoria_dane($this->post_type_name)) as $cat){
             wp_insert_term ($cat[0], 'kategoria_'.$this->post_type_name, array( 'description' => $cat[0] .'', 'slug' => $cat[1].' - '.$cat[2] ));
         }
     }
@@ -203,7 +227,7 @@ class ankieta extends new_custom_post_type{
             $wynik = intval (strip_tags( $_POST['rejsm_'.$this->post_type_name.'_wynik'] ) );
         }
         $kategoria ='';
-        foreach ($this->kategoria as $cat){
+        foreach ($this->kategoria_dane($this->post_type_name) as $cat){
             if ($wynik >= $cat[1] && $wynik <= $cat[2]) $kategoria = $cat[0];
         }
         wp_set_object_terms( $post_id, $kategoria, 'kategoria_'.$this->post_type_name,  false );
@@ -425,12 +449,6 @@ class msis_29 extends ankieta {
     protected $post_type_name = 'msis_29';
     protected $post_type_title = 'MSIS-29';
     protected $kategoria_label = 'Wpływ choroby';
-    protected $kategoria = array(
-        array ('minimalny', 0 ,29),
-        array ('średni', 30 ,58),
-        array ('mocny',59 ,87),
-        array ('bardzo mocny', 88 ,116),
-    );
     protected $description = "Skala wpływu stwardnienia rozsianego (MSIS-29).";
     protected $menu_icon = 'dashicons-format-aside';
     protected $lista_naglowkow = array(
@@ -510,12 +528,6 @@ class eq5d extends ankieta {
     protected $post_type_name = 'eq5d';
     protected $post_type_title = 'EQ-5D';
     protected $kategoria_label = 'Samopoczucie';
-    public $kategoria = array(
-        array ('bardzo złe', 1 ,25),
-        array ('złe', 26 ,50),
-        array ('dobre',51 ,75),
-        array ('bardzo dobre', 76 ,100),
-    );
     protected $description = "Skala wpływu stwardnienia rozsianego (EQ-5D).";
     protected $menu_icon = 'dashicons-clipboard';
     protected $lista_naglowkow = array(

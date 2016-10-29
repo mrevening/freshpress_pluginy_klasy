@@ -24,7 +24,13 @@ class uzytkownicy_list{
         add_action('manage_users_columns', array($this,'remove_user_posts_column'));
 //        add_filter( 'login_redirect', array($this,'your_login_redirect'), 10, 3 );
         
+
+        add_action( 'wp_before_admin_bar_render', array($this,'remove_wp_logo' ));
     }
+    function remove_wp_logo() {
+	global $wp_admin_bar;
+	$wp_admin_bar->remove_menu('wp-logo');
+}
     public function my_login_head() {
         echo "
         <style>
@@ -140,6 +146,9 @@ class uzytkownicy_list{
         }
         return $val;
     }
+    protected function szpital_substr($string){
+        return $string = substr($string, 0, strstr($string, ','));
+    }
     public function custom_count_posts_by_author($user_id, $post_type ){
     $args = array(
         'post_type' => $post_type,
@@ -175,7 +184,7 @@ class uzytkownicy_list{
                 }
                 //var_dump ($term_list);
                 $out = sprintf('<a href="%s#szpital">%s</a>',
-                            esc_url( add_query_arg( array( 'user_id' => $author_id ), 'user-edit.php' ) ), $i);
+                            esc_url( add_query_arg( array( 'user_id' => $author_id ), 'user-edit.php' ) ), strstr($i, ',', true));
                             //esc_url( add_query_arg( array( 'taxonomy' => $column ), 'edit-tags.php' ) ), $i);
                 break;
             case 'dane_demograficzne' :
@@ -189,7 +198,7 @@ class uzytkownicy_list{
 //                    $out = sprintf('<a href="%s">%s</a>', esc_url( add_query_arg( array( 'post_type' => $column, 'user_id' => $author_id ), 'post-new.php' ) ), 'dodaj');
                 }
                 else {
-                    $out = sprintf('<a href="%s">%s</a>', esc_url( add_query_arg( array( 'post_type' => $column, 'user_id' => $author_id ), 'edit.php' ) ), 'zobacz');
+                    $out = sprintf('<a href="%s">%s</a>', esc_url( add_query_arg( array( 'post_type' => $column, 'author' => $author_id ), 'edit.php' ) ), 'zobacz');
                 }
                 break;
         }
